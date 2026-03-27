@@ -148,7 +148,7 @@ ColumnLayout
 
         Layout.fillWidth: true
 
-        text: model.title
+        text: model.title ? model.title.replace(/^#+\s*/, "") : ""
         color: Maui.Theme.textColor
         elide: Qt.ElideRight
         wrapMode: TextEdit.WrapAnywhere
@@ -166,11 +166,11 @@ ColumnLayout
         Layout.fillWidth: true
         padding: 0
         visible: model.content && text.length > 0
-        text: model.content ? model.content : ""
+        text: model.content ? model.content.replace(/^#[^\n]*\n?/, "") : ""
         color: Maui.Theme.textColor
         wrapMode: TextEdit.WrapAnywhere
         font.family: settings.font.family
-        textFormat : TextEdit.PlainText
+        textFormat: TextEdit.MarkdownText
         font.pointSize: Maui.Style.fontSizes.medium
 
     }
