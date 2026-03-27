@@ -13,7 +13,7 @@ import "views/notes"
 Maui.ApplicationWindow
 {
     id: root
-    title: i18n("Buho")
+    title: notesView.currentTitle.length > 0 ? notesView.currentTitle + " — " + i18n("Buho") : i18n("Buho")
 
     readonly property font defaultFont : Maui.Style.defaultFont
 

@@ -23,8 +23,12 @@ StackView
 
     readonly property Flickable flickable : currentItem.flickable
 
+    property string currentTitle: ""
+
+    onDepthChanged: if (depth <= 1) currentTitle = ""
+
     property var noteWindowsMap : (new Map())
-    property bool notePerWindow : Maui.Handy.isLinux && !Maui.Handy.isMobile
+    property bool notePerWindow : false
 
     function setNote(note)
     {
@@ -47,6 +51,7 @@ StackView
         }else
         {
             control.push(_editNoteComponent, {'note': note,'noteIndex': control.currentIndex})
+            currentTitle = note.title || ""
             control.currentItem.editor.body.forceActiveFocus()
         }
     }
@@ -60,6 +65,7 @@ StackView
             window.forceActiveFocus()
         }else
         {
+            currentTitle = ""
             control.push(_newNoteComponent, {'text': contents})
             control.currentItem.editor.body.forceActiveFocus()
         }
@@ -84,6 +90,7 @@ StackView
         NewNoteDialog
         {
             id: _note
+            onTitleChanged: control.currentTitle = title
             headBar.farLeftContent: ToolButton
             {
                 icon.name: "go-previous"
@@ -214,6 +221,7 @@ StackView
         NewNoteDialog
         {
             id: _note
+            onTitleChanged: control.currentTitle = title
             headBar.farLeftContent: ToolButton
             {
                 icon.name: "go-previous"
