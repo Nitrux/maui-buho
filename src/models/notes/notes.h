@@ -20,6 +20,7 @@ private:
     void setList();
     void sortList();
 
+    void enrichNote(FMH::MODEL &note);
     void appendNote(FMH::MODEL note);
 
 public Q_SLOTS:
@@ -27,6 +28,6 @@ public Q_SLOTS:
     bool update(const QVariantMap &data, const int &index);
     bool remove(const int &index);
     int indexOfNote(const QUrl &url);
-
     int indexOfName(const QString &query);
+    void refreshNote(const int &index);
 };

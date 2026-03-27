@@ -5,7 +5,9 @@
 #include <QDebug>
 
 #include <MauiKit4/FileBrowsing/fm.h>
+#include <MauiKit4/FileBrowsing/tagging.h>
 
+#include <QDateTime>
 #include <algorithm>
 
 Notes::Notes(QObject *parent)
@@ -31,6 +33,7 @@ Notes::Notes(QObject *parent)
             if (index >= 0) {
                 qDebug() << note[FMH::MODEL_KEY::MODIFIED] << index;
                 note.insert(FMStatic::getFileInfoModel(QUrl(note[FMH::MODEL_KEY::URL])));
+                enrichNote(note);
                 qDebug() << note[FMH::MODEL_KEY::MODIFIED];
                 this->notes[index] = note;
                 Q_EMIT this->updateModel(index, {});
@@ -41,6 +44,24 @@ Notes::Notes(QObject *parent)
     connect(syncer, &NotesSyncer::noteReady, this, &Notes::appendNote);
 }
 
+void Notes::enrichNote(FMH::MODEL &note)
+{
+    const auto tagData = Tagging::getInstance()->getUrlTags(note[FMH::MODEL_KEY::URL], false);
+    QStringList tagNames;
+    for (const auto &t : std::as_const(tagData))
+        tagNames << t.toMap().value(QStringLiteral("tag")).toString();
+    note[FMH::MODEL_KEY::TAG] = tagNames.join(QLatin1Char(','));
+
+    auto dt = QDateTime::fromString(note[FMH::MODEL_KEY::MODIFIED], Qt::ISODate);
+    if (!dt.isValid())
+        dt = QDateTime::fromString(note[FMH::MODEL_KEY::MODIFIED], Qt::ISODateWithMs);
+    if (!dt.isValid())
+        dt = QDateTime::fromString(note[FMH::MODEL_KEY::MODIFIED], Qt::TextDate);
+    if (!dt.isValid())
+        dt = QDateTime::fromMSecsSinceEpoch(note[FMH::MODEL_KEY::MODIFIED].toLongLong());
+    note[FMH::MODEL_KEY::DATE] = dt.isValid() ? QLocale().toString(dt, QStringLiteral("MMM yyyy")) : QString();
+}
+
 void Notes::appendNote(FMH::MODEL note)
 {
     qDebug() << "APPEND NOTE <<" << note[FMH::MODEL_KEY::ID];
@@ -49,6 +70,8 @@ void Notes::appendNote(FMH::MODEL note)
         return lines.isEmpty() ? QString() : lines.first().trimmed();
     }();
     note.insert(FMStatic::getFileInfoModel(QUrl(note[FMH::MODEL_KEY::URL])));
+    enrichNote(note);
+
     Q_EMIT this->preItemAppended();
     this->notes << note;
     Q_EMIT this->postItemAppended();
@@ -120,6 +143,15 @@ int Notes::indexOfName(const QString &query)
         return std::distance(this->items().constBegin(), it);
     else
         return -1;
+}
+
+void Notes::refreshNote(const int &index)
+{
+    if (index < 0 || index >= this->notes.size())
+        return;
+    auto &note = this->notes[index];
+    enrichNote(note);
+    Q_EMIT this->updateModel(index, {FMH::MODEL_KEY::TAG, FMH::MODEL_KEY::DATE});
 }
 
 void Notes::componentComplete()

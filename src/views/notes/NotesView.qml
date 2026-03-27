@@ -331,6 +331,20 @@ StackView
 
         Maui.Controls.showCSD: true
 
+        property var _monthYears: {
+            notesList.count  // depend on source model so proxy lag doesn't drop notes
+            var seen = {}
+            var order = []
+            for (var i = 0; i < notesModel.count; i++) {
+                var note = notesModel.get(i)
+                if (note && note.date && note.date.length > 0 && !seen[note.date]) {
+                    seen[note.date] = true
+                    order.push(note.date)
+                }
+            }
+            return order  // notesModel is sorted newest-first, so order is newest-first
+        }
+
         gridView.itemSize: Math.min(300, control.width* 0.4)
         gridView.cellHeight: 180
 
@@ -368,24 +382,95 @@ StackView
             }
         ]
 
-        headBar.rightContent: Maui.ToolButtonMenu
-        {
-            icon.name: "overflow-menu"
+        headBar.rightContent: [
 
-            MenuItem
+            Label
             {
-                text: i18n("Preferences")
-                icon.name: "settings-configure"
-                onTriggered: _settingsDialog.open()
-            }
+                text: i18n("Month")
+                verticalAlignment: Text.AlignVCenter
+                color: Maui.Theme.textColor
+                opacity: 0.7
+            },
 
-            MenuItem
+            ComboBox
             {
-                text: i18n("About")
-                icon.name: "documentinfo"
-                onTriggered: Maui.App.aboutDialog()
+                id: _tagComboBox
+                implicitWidth: 150
+                displayText: currentIndex < 0 ? i18n("All") : currentText
+                currentIndex: -1
+
+                model: cardsView._monthYears
+
+                property int _prevIndex: -1
+
+                onModelChanged:
+                {
+                    if (currentIndex >= 0)
+                    {
+                        var newIdx = model.indexOf(notesModel.filter)
+                        if (newIdx < 0)
+                        {
+                            currentIndex = -1
+                            _prevIndex = -1
+                            notesModel.filter = ""
+                        }
+                        else
+                        {
+                            currentIndex = newIdx
+                        }
+                    }
+                }
+
+                onActivated: (index) =>
+                {
+                    var period = model[index]
+                    if (!period || period.trim().length === 0)
+                    {
+                        currentIndex = -1
+                        _prevIndex = -1
+                        notesModel.filter = ""
+                        return
+                    }
+                    if (_prevIndex === index)
+                    {
+                        currentIndex = -1
+                        _prevIndex = -1
+                        notesModel.filter = ""
+                    }
+                    else
+                    {
+                        _prevIndex = index
+                        notesModel.filterRole = "date"
+                        notesModel.filter = period
+                    }
+                }
+            },
+
+            ToolSeparator
+            {
+                bottomPadding: 10
+                topPadding: 10
+            },
+
+            Maui.ToolButtonMenu
+            {
+                icon.name: "overflow-menu"
+
+                MenuItem
+                {
+                    text: i18n("Preferences")
+                    icon.name: "settings-configure"
+                    onTriggered: _settingsDialog.open()
+                }
+
+                MenuItem
+                {
+                    text: i18n("About")
+                    icon.name: "documentinfo"
+                    onTriggered: Maui.App.aboutDialog()
+                }
             }
-        }
+        ]
 
         property string typingQuery
 
@@ -714,9 +799,35 @@ StackView
             }
         }
 
+        FB.TagsDialog
+        {
+            id: _tagsDialog
+            composerList.strict: false
+            onTagsReady: (tags) =>
+            {
+                if (!tags || tags.length === 0)
+                    return
+                composerList.updateToUrls(tags)
+                notesList.refreshNote(notesModel.mappedToSource(cardsView.currentIndex))
+            }
+        }
+
         Maui.ContextualMenu
         {
             id: _notesMenu
+
+            MenuItem
+            {
+                icon.name: "tag"
+                text: i18n("Add Label")
+                onTriggered:
+                {
+                    _tagsDialog.composerList.urls = [currentNote.url]
+                    _tagsDialog.open()
+                }
+            }
+
+            MenuSeparator {}
 
             MenuItem
             {
