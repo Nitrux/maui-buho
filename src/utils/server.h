@@ -1,7 +1,6 @@
 #pragma once
 #include <QObject>
 
-#if (defined Q_OS_LINUX || defined Q_OS_FREEBSD) && !defined Q_OS_ANDROID
 class OrgKdeBuhoActionsInterface;
 
 namespace AppInstance
@@ -12,7 +11,6 @@ bool attachToExistingInstance(bool newNote = false, const QString &content = "")
 
 bool registerService();
 }
-#endif
 
 class Server : public QObject
 {

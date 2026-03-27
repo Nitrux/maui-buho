@@ -23,10 +23,6 @@ set(REQUIRED_QT_VERSION 6.5.2)
 
 set(REQUIRED_KF_VERSION 5.240.0)
 
-if(ANDROID)
-    set(ANDROID_ABIS "arm64-v8a")
-endif()
-
 option(QUICK_COMPILER "Use QtQuick compiler to improve performance" TRUE)
 
 find_package(ECM ${REQUIRED_KF_VERSION} REQUIRED NO_MODULE)
@@ -37,21 +33,12 @@ find_package(KF6 ${REQUIRED_KF_VERSION} REQUIRED COMPONENTS I18n CoreAddons)
 
 find_package(MauiKit4 REQUIRED COMPONENTS FileBrowsing Accounts TextEditor)
 
-#find_package(Tesseract REQUIRED)
-#find_package(Leptonica REQUIRED)
+find_package(Qt6 ${REQUIRED_QT_VERSION} REQUIRED NO_MODULE COMPONENTS Widgets DBus)
 
-if(ANDROID)
-    find_package(Qt6 ${REQUIRED_QT_VERSION} REQUIRED NO_MODULE COMPONENTS Multimedia QuickControls2)
-elseif(UNIX)
-    find_package(Qt6 ${REQUIRED_QT_VERSION} REQUIRED NO_MODULE COMPONENTS Widgets DBus)
-endif()
-
-if(UNIX AND NOT APPLE AND NOT ANDROID)
-    include(KDEInstallDirs)
-    include(KDECMakeSettings)
-    include(ECMInstallIcons)
-    include(ECMAddAppIcon)
-endif()
+include(KDEInstallDirs)
+include(KDECMakeSettings)
+include(ECMInstallIcons)
+include(ECMAddAppIcon)
 
 include(KDECompilerSettings NO_POLICY_SCOPE)
 include(KDEClangFormat)

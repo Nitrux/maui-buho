@@ -101,8 +101,7 @@ Maui.Page
         {
             icon.name: "document-share"
 
-            onClicked: Maui.Handy.isAndroid ? Maui.Android.shareText(editor.body.text) :
-                                              Maui.Platform.shareFiles(editor.fileUrl)
+            onClicked: Maui.Platform.shareFiles(editor.fileUrl)
         },
 
         Maui.ToolButtonMenu

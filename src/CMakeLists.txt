@@ -37,32 +37,15 @@ qt_add_resources(buho_ASSETS
     assets/imgs.qrc
     assets.qrc)
 
-if(UNIX AND NOT ANDROID)
-    qt_generate_dbus_interface(${CMAKE_CURRENT_SOURCE_DIR}/utils/server.h org.kde.Buho.xml)
-    qt_add_dbus_adaptor(buho_dbus_SRCS ${CMAKE_CURRENT_BINARY_DIR}/org.kde.Buho.xml utils/server.h Server)
-    qt_add_dbus_interface(buho_dbus_SRCS ${CMAKE_CURRENT_BINARY_DIR}/org.kde.Buho.xml buhointerface)
-endif()
+qt_generate_dbus_interface(${CMAKE_CURRENT_SOURCE_DIR}/utils/server.h org.kde.Buho.xml)
+qt_add_dbus_adaptor(buho_dbus_SRCS ${CMAKE_CURRENT_BINARY_DIR}/org.kde.Buho.xml utils/server.h Server)
+qt_add_dbus_interface(buho_dbus_SRCS ${CMAKE_CURRENT_BINARY_DIR}/org.kde.Buho.xml buhointerface)
 
-if(ANDROID)
-    include(/home/camilo/Android/Sdk/android_openssl/android_openssl.cmake)
-
-    qt_add_executable(${PROJECT_NAME}
-        MANUAL_FINALIZATION
-        ${buho_SRCS}
-        ${buho_HDRS}
-        ${buho_ASSETS})
-
-    set_property(TARGET ${PROJECT_NAME} APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/android_files)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/android_files/version.gradle.in ${CMAKE_BINARY_DIR}/src/version.gradle)
-
-    add_android_openssl_libraries(${PROJECT_NAME})
-else()
-    add_executable(${PROJECT_NAME}
-        ${buho_SRCS}
-        ${buho_HDRS}
-        ${buho_dbus_SRCS}
-        ${buho_ASSETS})
-endif()
+add_executable(${PROJECT_NAME}
+    ${buho_SRCS}
+    ${buho_HDRS}
+    ${buho_dbus_SRCS}
+    ${buho_ASSETS})
 
 qt_add_qml_module(${PROJECT_NAME} URI app.maui.buho
     NO_PLUGIN
@@ -75,18 +58,10 @@ qt_add_qml_module(${PROJECT_NAME} URI app.maui.buho
     widgets/SettingsDialog.qml)
 
 
-if (ANDROID)
-    # find_package(OpenSSL REQUIRED)
-    target_link_libraries(${PROJECT_NAME}
-        PRIVATE
-        Qt6::Multimedia
-        Qt6::QuickControls2)
-elseif(UNIX)
-    target_link_libraries(${PROJECT_NAME}
-        PRIVATE
-        Qt6::Widgets
-        Qt6::DBus)
-endif()
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+    Qt6::Widgets
+    Qt6::DBus)
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
@@ -101,14 +76,12 @@ target_link_libraries(${PROJECT_NAME}
     KF6::CoreAddons
     KF6::I18n)
 
-if(UNIX AND NOT APPLE AND NOT ANDROID)
-    install(TARGETS buho ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
-    install(FILES org.kde.buho.desktop DESTINATION ${KDE_INSTALL_APPDIR})
+install(TARGETS buho ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
+install(FILES org.kde.buho.desktop DESTINATION ${KDE_INSTALL_APPDIR})
 
-    #TODO: port to ecm_install_icons()
-    install(FILES assets/buho.svg DESTINATION ${KDE_INSTALL_ICONDIR}/hicolor/scalable/apps)
-    install(FILES org.kde.buho.metainfo.xml DESTINATION ${KDE_INSTALL_METAINFODIR})
-endif()
+#TODO: port to ecm_install_icons()
+install(FILES assets/buho.svg DESTINATION ${KDE_INSTALL_ICONDIR}/hicolor/scalable/apps)
+install(FILES org.kde.buho.metainfo.xml DESTINATION ${KDE_INSTALL_METAINFODIR})
 
 qt_finalize_target(${PROJECT_NAME})
 

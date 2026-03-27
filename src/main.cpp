@@ -9,12 +9,7 @@
 #include <MauiKit4/Core/mauiapp.h>
 #include <MauiKit4/TextEditor/moduleinfo.h>
 
-#ifdef Q_OS_ANDROID
-#include <QGuiApplication>
-#include <MauiKit4/Core/mauiandroid.h>
-#else
 #include <QApplication>
-#endif
 
 #include "../buho_version.h"
 
@@ -36,11 +31,7 @@ static void setFolders()
 
 int Q_DECL_EXPORT main(int argc, char *argv[])
 {
-#ifdef Q_OS_ANDROID
-    QGuiApplication app(argc, argv);
-#else
     QApplication app(argc, argv);
-#endif
 
     setFolders ();
 
@@ -85,7 +76,6 @@ int Q_DECL_EXPORT main(int argc, char *argv[])
     bool newNote = parser.isSet(newNoteOption);
     QString noteContent;
 
-#if (defined Q_OS_LINUX || defined Q_OS_FREEBSD) && !defined Q_OS_ANDROID
     if(newNote)
     {
         if(parser.isSet(newNoteContent))
@@ -101,7 +91,6 @@ int Q_DECL_EXPORT main(int argc, char *argv[])
     }
 
     AppInstance::registerService();
-#endif
 
     auto server = std::make_unique<Server>();
 
