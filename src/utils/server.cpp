@@ -66,7 +66,7 @@ bool AppInstance::attachToExistingInstance(bool newNote, const QString& content)
         return attached;
     }
 
-    for (const auto& interface: qAsConst(dolphinInterfaces))
+    for (const auto& interface: std::as_const(dolphinInterfaces))
     {
         if(newNote)
         {

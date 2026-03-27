@@ -13,6 +13,11 @@ project(buho VERSION ${BUHO_VERSION})
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+cmake_host_system_information(RESULT _host_arch QUERY OS_PLATFORM)
+if(_host_arch MATCHES "x86_64|amd64")
+    add_compile_options(-march=x86-64-v3)
+endif()
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)

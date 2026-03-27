@@ -22,19 +22,10 @@ Maui.ApplicationWindow
     {
         id: settings
         category: "General"
-        property bool autoSync : true
         property bool autoSave: true
         property bool autoReload: true
-        property bool lineNumbers: true
-
-        property string sortBy:  "modified"
-        property int sortOrder : Qt.DescendingOrder
 
         property font font : defaultFont
-
-        property bool spellcheckEnabled: true
-
-        // property bool notePerWindow : Maui.Handy.isLinux && !Maui.Handy.isMobile
     }
 
     SettingsDialog

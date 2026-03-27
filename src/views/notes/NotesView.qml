@@ -3,7 +3,6 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 import org.mauikit.controls as Maui
-import org.mauikit.accounts as MA
 import org.mauikit.filebrowsing as FB
 
 import org.maui.buho
@@ -310,7 +309,7 @@ StackView
                 onTriggered: control.newNote()
             }]
 
-        headBar.rightContent: ToolButton
+        headBar.leftContent: ToolButton
         {
             icon.name: "list-add"
             onClicked: control.newNote()
@@ -320,10 +319,8 @@ StackView
         headBar.middleContent: Loader
         {
             Layout.fillWidth: true
-            Layout.maximumWidth: 500
+            Layout.maximumWidth: 250
             Layout.alignment: Qt.AlignCenter
-            //            active: notesList.count > 0
-            //            visible: active
             asynchronous: true
 
             sourceComponent: Maui.SearchField
@@ -334,15 +331,13 @@ StackView
             }
         }
 
-        headBar.leftContent: Maui.ToolButtonMenu
+        headBar.rightContent: Maui.ToolButtonMenu
         {
-            icon.name: "application-menu"
-
-            MA.AccountsMenuItem{}
+            icon.name: "overflow-menu"
 
             MenuItem
             {
-                text: i18n("Settings")
+                text: i18n("Preferences")
                 icon.name: "settings-configure"
                 onTriggered: _settingsDialog.open()
             }
@@ -429,8 +424,8 @@ StackView
             {
                 id: notesList
             }
-            sortOrder: settings.sortOrder
-            sort: settings.sortBy
+            sortOrder: Qt.DescendingOrder
+            sort: "modified"
             recursiveFilteringEnabled: true
             sortCaseSensitivity: Qt.CaseInsensitive
             filterCaseSensitivity: Qt.CaseInsensitive
@@ -694,71 +689,6 @@ StackView
         {
             id: _notesMenu
 
-            property bool isFav: currentNote.favorite == 1
-
-            Maui.MenuItemActionRow
-            {
-                Action
-                {
-                    icon.name: "love"
-                    text: _notesMenu.isFav? i18n("UnFav") : i18n("Fav")
-                    onTriggered:
-                    {
-                        notesList.update(({"favorite": _notesMenu.isFav ? 0 : 1}), notesModel.mappedToSource(cardsView.currentIndex))
-                        _notesMenu.close()
-                    }
-                }
-
-                Action
-                {
-                    icon.name: "document-export"
-                    text: i18n("Export")
-                    onTriggered:
-                    {
-                        _notesMenu.close()
-                    }
-                }
-
-                Action
-                {
-                    icon.name : "edit-copy"
-                    text: i18n("Copy")
-                    onTriggered:
-                    {
-                        Maui.Handy.copyToClipboard({'text': currentNote.content})
-                        _notesMenu.close()
-                    }
-                }
-
-                Action
-                {
-                    text: i18n("Share")
-                    icon.name: "document-share"
-                    onTriggered: Maui.Platform.shareText(currentNote.content)
-                    //                    onTriggered: shareClicked()
-                }
-            }
-
-            MenuSeparator {}
-
-            MenuItem
-            {
-                text: i18n("Select")
-                icon.name: "item-select"
-                onTriggered:
-                {
-                    if(Maui.Handy.isTouch)
-                    {
-                        cardsView.selectionMode = true
-                    }
-
-                    cardsView.currentView.itemsSelected([cardsView.currentIndex])
-                }
-            }
-
-
-            MenuSeparator { }
-
             MenuItem
             {
                 icon.name: "edit-delete"
@@ -771,8 +701,7 @@ StackView
                 }
             }
 
-            MenuSeparator { }
-
+            MenuSeparator {}
 
             ColorsBar
             {
@@ -786,7 +715,6 @@ StackView
                     _notesMenu.close()
                 }
             }
-
         }
     }
 
