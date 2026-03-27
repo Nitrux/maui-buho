@@ -314,9 +314,11 @@ StackView
                     destDir = destDir.slice(0, -1)
                 for (var item of control._pendingExport)
                 {
-                    var srcPath = item.path.toString()
-                    var baseName = srcPath.split("/").pop().replace(/\.[^.]+$/, "")
-                    FB.FM.copy([item.path], destDir + "/" + baseName + ".md")
+                    var title = (item.title || "").trim().replace(/^#+\s*/, "")
+                    var safeName = title.replace(/[\/\\:*?"<>|]/g, "_").replace(/\s{2,}/g, " ").trim()
+                    if (!safeName)
+                        safeName = decodeURIComponent(item.path.toString().split("/").pop().replace(/\.[^.]+$/, ""))
+                    FB.FM.copy([item.path], destDir + "/" + encodeURIComponent(safeName + ".md"))
                 }
             }
             _selectionbar.clear()
@@ -759,19 +761,6 @@ StackView
             }
         }
 
-        FB.TagsDialog
-        {
-            id: _tagsDialog
-            composerList.strict: false
-            onTagsReady: (tags) =>
-            {
-                if (!tags || tags.length === 0)
-                    return
-                composerList.updateToUrls(tags)
-                notesList.refreshNote(notesModel.mappedToSource(cardsView.currentIndex))
-            }
-        }
-
         Maui.ContextualMenu
         {
             id: _notesMenu
@@ -786,19 +775,6 @@ StackView
                     select(currentNote)
                 }
             }
-
-            MenuItem
-            {
-                icon.name: "tag"
-                text: i18n("Add Label")
-                onTriggered:
-                {
-                    _tagsDialog.composerList.urls = [currentNote.url]
-                    _tagsDialog.open()
-                }
-            }
-
-            MenuSeparator {}
 
             MenuItem
             {
