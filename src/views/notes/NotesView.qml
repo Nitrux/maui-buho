@@ -818,6 +818,17 @@ StackView
 
             MenuItem
             {
+                icon.name: "edit-select"
+                text: _selectionbar.contains(currentNote.path) ? i18n("Deselect") : i18n("Select")
+                onTriggered:
+                {
+                    cardsView.selectionMode = true
+                    select(currentNote)
+                }
+            }
+
+            MenuItem
+            {
                 icon.name: "tag"
                 text: i18n("Add Label")
                 onTriggered:
