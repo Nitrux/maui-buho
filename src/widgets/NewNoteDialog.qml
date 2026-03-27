@@ -116,7 +116,7 @@ Maui.Page
         ToolButton
         {
             id: _previewButton
-            icon.name: "view-split-left-right"
+            icon.name: control.height > control.width ? "view-split-top-bottom" : "view-split-left-right"
             checkable: true
             checked: true
         },
@@ -195,13 +195,15 @@ Maui.Page
     SplitView
     {
         anchors.fill: parent
-        orientation: Qt.Horizontal
+        orientation: control.height > control.width ? Qt.Vertical : Qt.Horizontal
 
         TE.TextEditor
         {
             id: _editor
-            SplitView.fillWidth: true
-            SplitView.minimumWidth: 200
+            SplitView.fillWidth: control.height <= control.width
+            SplitView.fillHeight: control.height > control.width
+            SplitView.minimumWidth: control.height <= control.width ? 200 : 0
+            SplitView.minimumHeight: control.height > control.width ? 200 : 0
 
             fileUrl: control.note.url
             showLineNumbers: false
@@ -254,8 +256,10 @@ Maui.Page
         {
             id: _previewPane
             visible: _previewButton.checked
-            SplitView.preferredWidth: parent.width / 2
-            SplitView.minimumWidth: visible ? 200 : 0
+            SplitView.preferredWidth: control.height <= control.width ? parent.width / 2 : 0
+            SplitView.preferredHeight: control.height > control.width ? parent.height / 2 : 0
+            SplitView.minimumWidth: (control.height <= control.width && visible) ? 200 : 0
+            SplitView.minimumHeight: (control.height > control.width && visible) ? 200 : 0
             clip: true
 
             TextEdit
