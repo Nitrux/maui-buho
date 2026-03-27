@@ -7,7 +7,6 @@
 #include <MauiKit4/FileBrowsing/fm.h>
 #include <MauiKit4/FileBrowsing/tagging.h>
 
-#include <QDateTime>
 #include <algorithm>
 
 Notes::Notes(QObject *parent)
@@ -51,15 +50,6 @@ void Notes::enrichNote(FMH::MODEL &note)
     for (const auto &t : std::as_const(tagData))
         tagNames << t.toMap().value(QStringLiteral("tag")).toString();
     note[FMH::MODEL_KEY::TAG] = tagNames.join(QLatin1Char(','));
-
-    auto dt = QDateTime::fromString(note[FMH::MODEL_KEY::MODIFIED], Qt::ISODate);
-    if (!dt.isValid())
-        dt = QDateTime::fromString(note[FMH::MODEL_KEY::MODIFIED], Qt::ISODateWithMs);
-    if (!dt.isValid())
-        dt = QDateTime::fromString(note[FMH::MODEL_KEY::MODIFIED], Qt::TextDate);
-    if (!dt.isValid())
-        dt = QDateTime::fromMSecsSinceEpoch(note[FMH::MODEL_KEY::MODIFIED].toLongLong());
-    note[FMH::MODEL_KEY::DATE] = dt.isValid() ? QLocale().toString(dt, QStringLiteral("MMM yyyy")) : QString();
 }
 
 void Notes::appendNote(FMH::MODEL note)
@@ -151,7 +141,7 @@ void Notes::refreshNote(const int &index)
         return;
     auto &note = this->notes[index];
     enrichNote(note);
-    Q_EMIT this->updateModel(index, {FMH::MODEL_KEY::TAG, FMH::MODEL_KEY::DATE});
+    Q_EMIT this->updateModel(index, {FMH::MODEL_KEY::TAG});
 }
 
 void Notes::componentComplete()

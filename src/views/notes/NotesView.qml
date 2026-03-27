@@ -331,20 +331,6 @@ StackView
 
         Maui.Controls.showCSD: true
 
-        property var _monthYears: {
-            notesList.count  // depend on source model so proxy lag doesn't drop notes
-            var seen = {}
-            var order = []
-            for (var i = 0; i < notesModel.count; i++) {
-                var note = notesModel.get(i)
-                if (note && note.date && note.date.length > 0 && !seen[note.date]) {
-                    seen[note.date] = true
-                    order.push(note.date)
-                }
-            }
-            return order  // notesModel is sorted newest-first, so order is newest-first
-        }
-
         gridView.itemSize: Math.min(300, control.width* 0.4)
         gridView.cellHeight: 180
 
@@ -386,7 +372,7 @@ StackView
 
             Label
             {
-                text: i18n("Month")
+                text: i18n("Sort")
                 verticalAlignment: Text.AlignVCenter
                 color: Maui.Theme.textColor
                 opacity: 0.7
@@ -394,55 +380,30 @@ StackView
 
             ComboBox
             {
-                id: _tagComboBox
-                implicitWidth: 150
-                displayText: currentIndex < 0 ? i18n("All") : currentText
-                currentIndex: -1
+                id: _sortComboBox
+                implicitWidth: 180
+                currentIndex: 0
 
-                model: cardsView._monthYears
+                model: [
+                    i18n("Modified (newest)"),
+                    i18n("Modified (oldest)"),
+                    i18n("Created (newest)"),
+                    i18n("Created (oldest)"),
+                    i18n("Title (A-Z)")
+                ]
 
-                property int _prevIndex: -1
-
-                onModelChanged:
-                {
-                    if (currentIndex >= 0)
-                    {
-                        var newIdx = model.indexOf(notesModel.filter)
-                        if (newIdx < 0)
-                        {
-                            currentIndex = -1
-                            _prevIndex = -1
-                            notesModel.filter = ""
-                        }
-                        else
-                        {
-                            currentIndex = newIdx
-                        }
-                    }
-                }
+                readonly property var _sorts: [
+                    { sort: "modified", order: Qt.DescendingOrder },
+                    { sort: "modified", order: Qt.AscendingOrder  },
+                    { sort: "added",    order: Qt.DescendingOrder },
+                    { sort: "added",    order: Qt.AscendingOrder  },
+                    { sort: "title",    order: Qt.AscendingOrder  }
+                ]
 
                 onActivated: (index) =>
                 {
-                    var period = model[index]
-                    if (!period || period.trim().length === 0)
-                    {
-                        currentIndex = -1
-                        _prevIndex = -1
-                        notesModel.filter = ""
-                        return
-                    }
-                    if (_prevIndex === index)
-                    {
-                        currentIndex = -1
-                        _prevIndex = -1
-                        notesModel.filter = ""
-                    }
-                    else
-                    {
-                        _prevIndex = index
-                        notesModel.filterRole = "date"
-                        notesModel.filter = period
-                    }
+                    notesModel.sort = _sorts[index].sort
+                    notesModel.sortOrder = _sorts[index].order
                 }
             },
 

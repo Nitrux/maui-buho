@@ -1,4 +1,5 @@
 #include <QCommandLineParser>
+#include <QDate>
 #include <QIcon>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
@@ -45,18 +46,19 @@ int Q_DECL_EXPORT main(int argc, char *argv[])
 
     KLocalizedString::setApplicationDomain("buho");
     KAboutData about(QStringLiteral("buho"),
-                     QStringLiteral("Buho"),
+                     i18n("Buho"),
                      BUHO_VERSION_STRING,
                      i18n("Create and organize your notes."),
                      KAboutLicense::LGPL_V3,
-                     APP_COPYRIGHT_NOTICE,
+                     i18n("© %1 Made by Nitrux | Built with MauiKit", QString::number(QDate::currentDate().year())),
                      QString(GIT_BRANCH) + "/" + QString(GIT_COMMIT_HASH));
 
     about.addAuthor(QStringLiteral("Camilo Higuita"), i18n("Developer"), QStringLiteral("milo.h@aol.com"));
-    about.setHomepage("https://mauikit.org");
-    about.setProductName("maui/buho");
-    about.setBugAddress("https://invent.kde.org/maui/buho/-/issues");
+    about.addAuthor(QStringLiteral("Uri Herrera"), i18n("Developer"), QStringLiteral("uri_herrera@nxos.org"));
+    about.setHomepage("https://nxos.org");
+    about.setProductName("nitrux/buho");
     about.setOrganizationDomain(BUHO_URI);
+    about.setDesktopFileName("org.maui.buho");
     about.setProgramLogo(app.windowIcon());
 
     const auto FBData = MauiKitTextEditor::aboutData();
