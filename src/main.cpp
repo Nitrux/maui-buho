@@ -9,7 +9,8 @@
 #include <MauiKit4/Core/mauiapp.h>
 #include <MauiKit4/TextEditor/moduleinfo.h>
 
-#include <QApplication>
+#include <QGuiApplication>
+#include <QSurfaceFormat>
 
 #include "../buho_version.h"
 
@@ -31,7 +32,11 @@ static void setFolders()
 
 int Q_DECL_EXPORT main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
+    QSurfaceFormat format;
+    format.setAlphaBufferSize(8);
+    QSurfaceFormat::setDefaultFormat(format);
+
+    QGuiApplication app(argc, argv);
 
     setFolders ();
 

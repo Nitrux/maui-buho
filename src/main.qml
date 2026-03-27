@@ -15,6 +15,27 @@ Maui.ApplicationWindow
     id: root
     title: notesView.currentTitle.length > 0 ? notesView.currentTitle + " — " + i18n("Buho") : i18n("Buho")
 
+    color: "transparent"
+    background: null
+
+    Maui.WindowBlur
+    {
+        view: root
+        geometry: Qt.rect(0, 0, root.width, root.height)
+        windowRadius: Maui.Style.radiusV
+        enabled: true
+    }
+
+    Rectangle
+    {
+        anchors.fill: parent
+        color: Maui.Theme.backgroundColor
+        opacity: 0.76
+        radius: Maui.Style.radiusV
+        border.color: Qt.rgba(1, 1, 1, 0)
+        border.width: 1
+    }
+
     readonly property font defaultFont : Maui.Style.defaultFont
 
     /***** COMPONENTS *****/

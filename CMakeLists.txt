@@ -38,7 +38,7 @@ find_package(KF6 ${REQUIRED_KF_VERSION} REQUIRED COMPONENTS I18n CoreAddons)
 
 find_package(MauiKit4 REQUIRED COMPONENTS FileBrowsing Accounts TextEditor)
 
-find_package(Qt6 ${REQUIRED_QT_VERSION} REQUIRED NO_MODULE COMPONENTS Widgets DBus)
+find_package(Qt6 ${REQUIRED_QT_VERSION} REQUIRED NO_MODULE COMPONENTS DBus)
 
 include(KDEInstallDirs)
 include(KDECMakeSettings)

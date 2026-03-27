@@ -12,6 +12,8 @@ import "../../widgets"
 StackView
 {
     id: control
+    background: null
+
     property var currentNote : ({})
 
     property alias cardsView : cardsView
@@ -26,6 +28,8 @@ StackView
     property string currentTitle: ""
 
     onDepthChanged: if (depth <= 1) currentTitle = ""
+
+    property var _pendingExport: []
 
     property var noteWindowsMap : (new Map())
     property bool notePerWindow : false
@@ -279,19 +283,51 @@ StackView
 
         template.iconSource: "dialog-warning"
 
-        standardButtons: Dialog.Cancel | Dialog.Yes
+        standardButtons: Dialog.Yes | Dialog.No
 
         onAccepted:
         {
-            console.log (notes)
+            var indices = []
+            for (var uri of notes)
+            {
+                var idx = notesList.indexOfNote(uri)
+                if (idx >= 0) indices.push(idx)
+            }
+            indices.sort(function(a, b) { return b - a })
+            for (var i = 0; i < indices.length; i++)
+                notesList.remove(indices[i])
+            _selectionbar.clear()
         }
 
         onRejected: close()
     }
 
+    FB.FileDialog
+    {
+        id: _exportDialog
+        onUrlsSelected: (urls) =>
+        {
+            if (urls.length > 0)
+            {
+                var destDir = urls[0].toString()
+                if (destDir.endsWith("/"))
+                    destDir = destDir.slice(0, -1)
+                for (var item of control._pendingExport)
+                {
+                    var srcPath = item.path.toString()
+                    var baseName = srcPath.split("/").pop().replace(/\.[^.]+$/, "")
+                    FB.FM.copy([item.path], destDir + "/" + baseName + ".md")
+                }
+            }
+            _selectionbar.clear()
+            control._pendingExport = []
+        }
+    }
+
     initialItem: Maui.AltBrowser
     {
         id: cardsView
+        background: null
 
         Maui.Controls.showCSD: true
 
@@ -309,13 +345,6 @@ StackView
         holder.emoji: "qrc:/view-notes.svg"
         holder.title :i18n("No notes!")
         holder.body: i18n("You can quickly create a new note")
-
-        holder.actions:[ Action
-            {
-                text: i18n("New note")
-                icon.name: "list-add"
-                onTriggered: control.newNote()
-            }]
 
         headBar.leftContent: ToolButton
         {
@@ -482,21 +511,13 @@ StackView
 
             Action
             {
-                text: i18n("Favorite")
-                icon.name: "love"
-                onTriggered:
-                {
-                    for(var item of _selectionbar.items)
-                        notesList.update(({"favorite": _notesMenu.isFav ? 0 : 1}), notesModel.mappedToSource(notesList.indexOfNote(item.path)))
-
-                    _selectionbar.clear()
-                }
-            }
-
-            Action
-            {
                 text: i18n("Export")
                 icon.name: "document-export"
+                onTriggered:
+                {
+                    control._pendingExport = Array.from(_selectionbar.items)
+                    _exportDialog.open()
+                }
             }
 
             Action

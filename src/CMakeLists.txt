@@ -60,7 +60,6 @@ qt_add_qml_module(${PROJECT_NAME} URI app.maui.buho
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
-    Qt6::Widgets
     Qt6::DBus)
 
 target_link_libraries(${PROJECT_NAME}

@@ -33,33 +33,6 @@ Maui.Page
             topPadding: 10
         },
 
-        Maui.ToolActions
-        {
-            expanded: true
-            autoExclusive: false
-            checkable: false
-
-            Action
-            {
-                icon.name: "edit-undo"
-                enabled: editor.body.canUndo
-                onTriggered: editor.body.undo()
-            }
-
-            Action
-            {
-                icon.name: "edit-redo"
-                enabled: editor.body.canRedo
-                onTriggered: editor.body.redo()
-            }
-        },
-
-        ToolSeparator
-        {
-            bottomPadding: 10
-            topPadding: 10
-        },
-
         ToolButton
         {
             icon.name: "format-text-bold"
