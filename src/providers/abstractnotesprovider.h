@@ -24,6 +24,10 @@ public:
     }
     virtual ~AbstractNotesProvider()
     {
+        m_user.fill(QLatin1Char('0'));
+        m_user.clear();
+        m_password.fill(QLatin1Char('0'));
+        m_password.clear();
     }
 
     /**

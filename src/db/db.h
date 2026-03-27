@@ -65,6 +65,7 @@ public:
     bool checkExistance(const QString &tableName, const QString &searchId, const QString &search);
     const FMH::MODEL_LIST getDBData(const QString &queryTxt);
     QSqlQuery getQuery(const QString &queryTxt);
+    QSqlDatabase db() const { return m_db; }
 
     bool insert(const QString &tableName, const QVariantMap &insertData);
     bool update(const QString &tableName, const QVariantMap &updateData, const QVariantMap &where);

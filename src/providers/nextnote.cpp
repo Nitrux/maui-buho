@@ -6,12 +6,13 @@
 #include <QVariantMap>
 #include <QNetworkReply>
 #include <QByteArrayView>
+#include <QSslError>
 
 const QString NextNote::API = QStringLiteral("/index.php/apps/notes/api/v0.2/");
 
 static const inline QNetworkRequest formRequest(const QUrl &url, const QString &user, const QString &password)
 {
-    if (!url.isValid() && !user.isEmpty() && !password.isEmpty())
+    if (!url.isValid() || user.isEmpty() || password.isEmpty())
         return QNetworkRequest();
 
     const QString concatenated = user + ":" + password;
@@ -45,7 +46,9 @@ void NextNote::getNote(const QString &id)
 {
     QUrl relativeUrl("../.." + NextNote::API + QString("notes/%1").arg(id));
     auto url = QUrl(this->m_provider).resolved(relativeUrl);
+#ifndef QT_NO_DEBUG
     qDebug() << "THE RESOLVED URL IS" << url << this->m_provider;
+#endif
 
 //    const auto request = formRequest(url, this->m_user, this->m_password);
     QString concatenated = this->m_user + ":" + this->m_password;
@@ -79,7 +82,9 @@ void NextNote::getNotes()
 {
     QUrl relativeUrl("../.." + NextNote::API + QString("notes"));
     auto url = QUrl(this->m_provider).resolved(relativeUrl);
+#ifndef QT_NO_DEBUG
     qDebug() << "THE RESOLVED URL IS" << url << this->m_provider;
+#endif
 
     QString concatenated = this->m_user + ":" + this->m_password;
     QByteArray data = concatenated.toLocal8Bit().toBase64();
@@ -113,7 +118,9 @@ void NextNote::getBooklets()
 {
     QUrl relativeUrl("../.." + NextNote::API + QString("notes"));
     auto url = QUrl(this->m_provider).resolved(relativeUrl);
+#ifndef QT_NO_DEBUG
     qDebug() << "THE RESOLVED URL IS" << url << this->m_provider;
+#endif
 
     QString concatenated = this->m_user + ":" + this->m_password;
     QByteArray data = concatenated.toLocal8Bit().toBase64();
@@ -146,18 +153,22 @@ void NextNote::getBooklets()
 void NextNote::insertNote(const FMH::MODEL &note)
 {
     QByteArray payload = QJsonDocument::fromVariant(FMH::toMap(FMH::filterModel(note, {FMH::MODEL_KEY::CONTENT, FMH::MODEL_KEY::FAVORITE}))).toJson();
-    qDebug() << "UPLOADING NEW NOT" << QVariant(payload).toString();
 
     QUrl relativeUrl("../.." + NextNote::API + QString("notes"));
     auto url = QUrl(this->m_provider).resolved(relativeUrl);
+#ifndef QT_NO_DEBUG
     qDebug() << "THE RESOLVED URL IS" << url << this->m_provider;
+#endif
 
     const auto request = formRequest(url, this->m_user, this->m_password);
 
     auto restclient = new QNetworkAccessManager; // constructor
     QNetworkReply *reply = restclient->post(request, payload);
+    QObject::connect(reply, &QNetworkReply::sslErrors, reply, [reply](const QList<QSslError> &errors) {
+        qWarning() << "SSL errors for" << reply->url() << errors;
+        reply->abort();
+    });
     connect(reply, &QNetworkReply::finished, [=, __note = note]() {
-        qDebug() << "Note insertyion finished?";
         const auto notes = this->parseNotes(reply->readAll());
         Q_EMIT this->noteInserted([&]() -> FMH::MODEL {
             FMH::MODEL note;
@@ -179,18 +190,22 @@ void NextNote::insertNote(const FMH::MODEL &note)
 void NextNote::insertBooklet(const FMH::MODEL &booklet)
 {
     QByteArray payload = QJsonDocument::fromVariant(FMH::toMap(FMH::filterModel(booklet, {FMH::MODEL_KEY::CONTENT, FMH::MODEL_KEY::FAVORITE, FMH::MODEL_KEY::CATEGORY}))).toJson();
-    qDebug() << "UPLOADING NEW BOOKLET" << QVariant(payload).toString();
 
     QUrl relativeUrl("../.." + NextNote::API + QString("notes"));
     auto url = QUrl(this->m_provider).resolved(relativeUrl);
+#ifndef QT_NO_DEBUG
     qDebug() << "THE RESOLVED URL IS" << url << this->m_provider;
+#endif
 
     const auto request = formRequest(url, this->m_user, this->m_password);
 
     auto restclient = new QNetworkAccessManager; // constructor
     QNetworkReply *reply = restclient->post(request, payload);
+    QObject::connect(reply, &QNetworkReply::sslErrors, reply, [reply](const QList<QSslError> &errors) {
+        qWarning() << "SSL errors for" << reply->url() << errors;
+        reply->abort();
+    });
     connect(reply, &QNetworkReply::finished, [=, __booklet = booklet]() {
-        qDebug() << "Note insertyion finished?";
         const auto booklets = this->parseNotes(reply->readAll());
         Q_EMIT this->bookletInserted([&]() -> FMH::MODEL {
             FMH::MODEL p_booklet;
@@ -217,19 +232,22 @@ void NextNote::updateNote(const QString &id, const FMH::MODEL &note)
     }
 
     QByteArray payload = QJsonDocument::fromVariant(FMH::toMap(FMH::filterModel(note, {FMH::MODEL_KEY::CONTENT, FMH::MODEL_KEY::FAVORITE, FMH::MODEL_KEY::MODIFIED, FMH::MODEL_KEY::CATEGORY}))).toJson();
-    qDebug() << "UPDATING NOTE" << QVariant(payload).toString();
 
     QUrl relativeUrl("../.." + NextNote::API + QString("notes/%1").arg(id));
     auto url = QUrl(this->m_provider).resolved(relativeUrl);
+#ifndef QT_NO_DEBUG
     qDebug() << "THE RESOLVED URL IS" << url << this->m_provider;
+#endif
 
-    qDebug() << "tryiong to update note" << url;
     const auto request = formRequest(url, this->m_user, this->m_password);
 
     auto restclient = new QNetworkAccessManager; // constructor
     QNetworkReply *reply = restclient->put(request, payload);
+    QObject::connect(reply, &QNetworkReply::sslErrors, reply, [reply](const QList<QSslError> &errors) {
+        qWarning() << "SSL errors for" << reply->url() << errors;
+        reply->abort();
+    });
     connect(reply, &QNetworkReply::finished, [=, __note = note]() {
-        qDebug() << "Note update finished?" << reply->errorString();
         const auto notes = this->parseNotes(reply->readAll());
         Q_EMIT this->noteUpdated([&]() -> FMH::MODEL {
             FMH::MODEL note;
@@ -258,19 +276,22 @@ void NextNote::updateBooklet(const QString &id, const FMH::MODEL &booklet)
     }
 
     QByteArray payload = QJsonDocument::fromVariant(FMH::toMap(FMH::filterModel(booklet, {FMH::MODEL_KEY::CONTENT, FMH::MODEL_KEY::CATEGORY}))).toJson();
-    qDebug() << "UPDATING BOOKLET" << QVariant(payload).toString();
 
     QUrl relativeUrl("../.." + NextNote::API + QString("notes/%1").arg(id));
     auto url = QUrl(this->m_provider).resolved(relativeUrl);
+#ifndef QT_NO_DEBUG
     qDebug() << "THE RESOLVED URL IS" << url << this->m_provider;
+#endif
 
-    qDebug() << "tryiong to update note" << url;
     const auto request = formRequest(url, this->m_user, this->m_password);
 
     auto restclient = new QNetworkAccessManager; // constructor
     QNetworkReply *reply = restclient->put(request, payload);
+    QObject::connect(reply, &QNetworkReply::sslErrors, reply, [reply](const QList<QSslError> &errors) {
+        qWarning() << "SSL errors for" << reply->url() << errors;
+        reply->abort();
+    });
     connect(reply, &QNetworkReply::finished, [=, __booklet = booklet]() {
-        qDebug() << "Note update finished?" << reply->errorString();
         const auto booklets = this->parseNotes(reply->readAll());
         Q_EMIT this->bookletUpdated([&]() -> FMH::MODEL {
             FMH::MODEL booklet;
@@ -301,14 +322,18 @@ void NextNote::removeNote(const QString &id)
 
     QUrl relativeUrl("../.." + NextNote::API + QString("notes/%1").arg(id));
     auto url = QUrl(this->m_provider).resolved(relativeUrl);
+#ifndef QT_NO_DEBUG
     qDebug() << "THE RESOLVED URL IS" << url << this->m_provider;
+#endif
 
     const auto request = formRequest(url, this->m_user, this->m_password);
-    qDebug() << "trying to remove nextnote <<" << url;
     auto restclient = new QNetworkAccessManager; // constructor
     QNetworkReply *reply = restclient->deleteResource(request);
+    QObject::connect(reply, &QNetworkReply::sslErrors, reply, [reply](const QList<QSslError> &errors) {
+        qWarning() << "SSL errors for" << reply->url() << errors;
+        reply->abort();
+    });
     connect(reply, &QNetworkReply::finished, [=]() {
-        qDebug() << "Note remove finished?" << reply->errorString();
         Q_EMIT this->noteRemoved();
         restclient->deleteLater();
         reply->deleteLater();
@@ -325,7 +350,7 @@ const FMH::MODEL_LIST NextNote::parseNotes(const QByteArray &array)
     FMH::MODEL_LIST res;
     //	qDebug()<< "trying to parse notes" << array;
     QJsonParseError jsonParseError;
-    QJsonDocument jsonResponse = QJsonDocument::fromJson(static_cast<QString>(array).toUtf8(), &jsonParseError);
+    QJsonDocument jsonResponse = QJsonDocument::fromJson(array, &jsonParseError);
 
     if (jsonParseError.error != QJsonParseError::NoError) {
         qDebug() << "ERROR PARSING" << array;

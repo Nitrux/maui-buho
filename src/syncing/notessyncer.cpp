@@ -3,6 +3,7 @@
 #include "db/db.h"
 
 #include <QDateTime>
+#include <QSqlQuery>
 
 #include <MauiKit4/FileBrowsing/fmstatic.h>
 #include <MauiKit4/FileBrowsing/tagging.h>
@@ -91,16 +92,25 @@ void NotesSyncer::getRemoteNotes()
 const QString NotesSyncer::noteIdFromStamp(const QString &provider, const QString &stamp)
 {
     return [&]() -> const QString {
-        const auto data = DB::getInstance()->getDBData(QString("select id from notes_sync where server = '%1' AND stamp = '%2'").arg(provider, stamp));
-        return data.isEmpty() ? QString() : data.first()[FMH::MODEL_KEY::ID];
+        QSqlQuery query(DB::getInstance()->db());
+        query.prepare(QStringLiteral("SELECT id FROM notes_sync WHERE server = ? AND stamp = ?"));
+        query.addBindValue(provider);
+        query.addBindValue(stamp);
+        if (query.exec() && query.next())
+            return query.value(0).toString();
+        return QString();
     }();
 }
 
 const QString NotesSyncer::noteStampFromId(const QString &id)
 {
     return [&]() -> const QString {
-        const auto data = DB::getInstance()->getDBData(QString("select stamp from notes_sync where id = '%1'").arg(id));
-        return data.isEmpty() ? QString() : data.first()[FMH::MODEL_KEY::STAMP];
+        QSqlQuery query(DB::getInstance()->db());
+        query.prepare(QStringLiteral("SELECT stamp FROM notes_sync WHERE id = ?"));
+        query.addBindValue(id);
+        if (query.exec() && query.next())
+            return query.value(0).toString();
+        return QString();
     }();
 }
 
@@ -139,8 +149,12 @@ void NotesSyncer::setConections()
             } else {
                 // the note does exists locally, so update it
                 note[FMH::MODEL_KEY::URL] = [&]() -> const QString {
-                    const auto data = DB::getInstance()->getDBData(QString("select url from notes where id = '%1'").arg(id));
-                    return data.isEmpty() ? QString() : data.first()[FMH::MODEL_KEY::URL];
+                    QSqlQuery query(DB::getInstance()->db());
+                    query.prepare(QStringLiteral("SELECT url FROM notes WHERE id = ?"));
+                    query.addBindValue(id);
+                    if (query.exec() && query.next())
+                        return query.value(0).toString();
+                    return QString();
                 }();
 
                 auto remoteDate = QDateTime::fromSecsSinceEpoch(note[FMH::MODEL_KEY::MODIFIED].toInt());

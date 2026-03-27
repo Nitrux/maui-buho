@@ -58,7 +58,7 @@ void DB::openDB(const QString &name)
         if (!this->m_db.open())
             qDebug() << "ERROR OPENING DB" << this->m_db.lastError().text() << m_db.connectionName();
     }
-    auto query = this->getQuery("PRAGMA synchronous=OFF");
+    auto query = this->getQuery("PRAGMA synchronous=NORMAL");
     query.exec();
 }
 
@@ -117,14 +117,18 @@ void DB::prepareCollectionDB() const
 
 bool DB::checkExistance(const QString &tableName, const QString &searchId, const QString &search)
 {
-    auto queryStr = QString("SELECT %1 FROM %2 WHERE %3 = \"%4\"").arg(searchId, tableName, searchId, search);
-    auto query = this->getQuery(queryStr);
+    QSqlQuery query(this->m_db);
+    query.prepare(QStringLiteral("SELECT %1 FROM %2 WHERE %3 = ?").arg(searchId, tableName, searchId));
+    query.addBindValue(search);
 
     if (query.exec()) {
         if (query.next())
             return true;
-    } else
+    } else {
+#ifndef QT_NO_DEBUG
         qDebug() << query.lastError().text();
+#endif
+    }
 
     return false;
 }
@@ -151,8 +155,11 @@ const FMH::MODEL_LIST DB::getDBData(const QString &queryTxt)
             mapList << data;
         }
 
-    } else
+    } else {
+#ifndef QT_NO_DEBUG
         qDebug() << query.lastError() << query.lastQuery();
+#endif
+    }
 
     return mapList;
 }
@@ -165,13 +172,11 @@ QSqlQuery DB::getQuery(const QString &queryTxt)
 
 bool DB::insert(const QString &tableName, const QVariantMap &insertData)
 {
-    qDebug() << "TRY TO ISNERT NOTE TO DB" << insertData;
     if (tableName.isEmpty()) {
-        qDebug() << QStringLiteral("Fatal error on insert! The table name is empty!");
+        qWarning() << "DB::insert: table name is empty";
         return false;
-
     } else if (insertData.isEmpty()) {
-        qDebug() << QStringLiteral("Fatal error on insert! The insertData is empty!");
+        qWarning() << "DB::insert: insertData is empty";
         return false;
     }
 
@@ -214,27 +219,30 @@ bool DB::update(const QString &tableName, const QVariantMap &updateData, const Q
     const auto whereKeys = where.keys();
     for (const auto &key : whereKeys)
     {
-        condition.append(key + " = '" + where[key].toString() + "'");
+        condition.append(key + " = ?");
     }
 
     QString sqlQueryString = "UPDATE " + tableName + " SET " + QString(set.join(",")) + " WHERE " + QString(condition.join(" AND "));
-    auto query = this->getQuery(sqlQueryString);
+    QSqlQuery query(this->m_db);
+    query.prepare(sqlQueryString);
 
     QVariantList values = updateData.values();
-    int k = 0;
     for(const QVariant &value : values)
-    {
-        query.bindValue(k++, value);
-    }
+        query.addBindValue(value);
 
-    qDebug() << query.lastQuery();
+    const auto whereValues = where.values();
+    for(const QVariant &value : whereValues)
+        query.addBindValue(value);
+
     return query.exec();
 }
 
 bool DB::update(const QString &table, const QString &column, const QVariant &newValue, const QVariant &op, const QString &id)
 {
-    auto queryStr = QString("UPDATE %1 SET %2 = \"%3\" WHERE %4 = \"%5\"").arg(table, column, newValue.toString().replace("\"", "\"\""), op.toString(), id);
-    auto query = this->getQuery(queryStr);
+    QSqlQuery query(this->m_db);
+    query.prepare(QStringLiteral("UPDATE %1 SET %2 = ? WHERE %3 = ?").arg(table, column, op.toString()));
+    query.addBindValue(newValue);
+    query.addBindValue(id);
     return query.exec();
 }
 

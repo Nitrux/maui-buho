@@ -36,6 +36,7 @@ static inline bool saveNoteFile(const QUrl &url, const QByteArray &data)
 
     QFile file(url.toLocalFile());
     if (file.open(QFile::WriteOnly)) {
+        file.setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner);
         file.write(data);
         file.close();
         return true;

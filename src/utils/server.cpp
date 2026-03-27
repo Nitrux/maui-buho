@@ -100,7 +100,7 @@ bool AppInstance::registerService()
     QDBusConnectionInterface *iface = QDBusConnection::sessionBus().interface();
 
     auto registration = iface->registerService(QStringLiteral("org.kde.buho-%1").arg(QCoreApplication::applicationPid()),
-                                               QDBusConnectionInterface::ReplaceExistingService,
+                                               QDBusConnectionInterface::DontQueueService,
                                                QDBusConnectionInterface::DontAllowReplacement);
 
     if (!registration.isValid())
@@ -108,6 +108,13 @@ bool AppInstance::registerService()
         qWarning("2 Failed to register D-Bus service \"%s\" on session bus: \"%s\"",
                  qPrintable("org.kde.buho"),
                  qPrintable(registration.error().message()));
+        return false;
+    }
+
+    if (registration.value() == QDBusConnectionInterface::ServiceNotRegistered)
+    {
+        qWarning("D-Bus service \"%s\" is already registered by another instance.",
+                 qPrintable(QStringLiteral("org.kde.buho-%1").arg(QCoreApplication::applicationPid())));
         return false;
     }
 

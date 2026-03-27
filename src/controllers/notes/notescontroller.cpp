@@ -2,6 +2,8 @@
 #include "db/db.h"
 #include "owl.h"
 
+#include <QDir>
+#include <QSqlQuery>
 #include <MauiKit4/FileBrowsing/fmstatic.h>
 #include <MauiKit4/FileBrowsing/tagging.h>
 
@@ -48,6 +50,12 @@ bool NotesController::insertNote(FMH::MODEL &note)
 
     note[FMH::MODEL_KEY::ID] = OWL::createId();
     const auto url_ = QUrl(OWL::NotesPath.toString() + note[FMH::MODEL_KEY::ID] + note[FMH::MODEL_KEY::FORMAT]);
+    const QString expectedBase = QDir::cleanPath(OWL::NotesPath.toLocalFile());
+    const QString notePath = QDir::cleanPath(url_.toLocalFile());
+    if (!notePath.startsWith(expectedBase + "/")) {
+        qWarning() << "Rejected note path outside notes directory:" << notePath;
+        return false;
+    }
     if (!OWL::saveNoteFile(url_, note[FMH::MODEL_KEY::CONTENT].toUtf8()))
         return false;
 
@@ -66,8 +74,12 @@ bool NotesController::updateNote(FMH::MODEL &note, QString id)
 
     if (note[FMH::MODEL_KEY::URL].isEmpty())
         note[FMH::MODEL_KEY::URL] = [&]() -> const QString {
-            const auto data = DB::getInstance()->getDBData(QString("select url from notes where id = '%1'").arg(id));
-            return data.isEmpty() ? QString() : data.first()[FMH::MODEL_KEY::URL];
+            QSqlQuery query(DB::getInstance()->db());
+            query.prepare(QStringLiteral("SELECT url FROM notes WHERE id = ?"));
+            query.addBindValue(id);
+            if (query.exec() && query.next())
+                return query.value(0).toString();
+            return QString();
         }();
 
     if (note[FMH::MODEL_KEY::URL].isEmpty())
@@ -83,8 +95,12 @@ bool NotesController::updateNote(FMH::MODEL &note, QString id)
 bool NotesController::removeNote(const QString &id)
 {
     const auto url = QUrl([&]() -> const QString {
-        const auto data = DB::getInstance()->getDBData(QString("select url from notes where id = '%1'").arg(id));
-        return data.isEmpty() ? QString() : data.first()[FMH::MODEL_KEY::URL];
+        QSqlQuery query(DB::getInstance()->db());
+        query.prepare(QStringLiteral("SELECT url FROM notes WHERE id = ?"));
+        query.addBindValue(id);
+        if (query.exec() && query.next())
+            return query.value(0).toString();
+        return QString();
     }());
 
     this->m_db->remove(OWL::TABLEMAP[OWL::TABLE::NOTES_SYNC], {{FMH::MODEL_NAME[FMH::MODEL_KEY::ID], id}});
