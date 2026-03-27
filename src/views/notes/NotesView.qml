@@ -373,9 +373,8 @@ StackView
             Label
             {
                 text: i18n("Sort")
+                font.weight: Font.DemiBold
                 verticalAlignment: Text.AlignVCenter
-                color: Maui.Theme.textColor
-                opacity: 0.7
             },
 
             ComboBox
