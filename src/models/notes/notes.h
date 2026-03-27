@@ -16,7 +16,6 @@ private:
     NotesSyncer *syncer;
 
     FMH::MODEL_LIST notes;
-    QVariantMap m_account;
 
     void setList();
     void sortList();

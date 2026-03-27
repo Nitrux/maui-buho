@@ -5,7 +5,6 @@
 #include <QDateTime>
 
 #include <MauiKit4/FileBrowsing/fmstatic.h>
-#include <MauiKit4/Accounts/mauiaccounts.h>
 #include <MauiKit4/FileBrowsing/tagging.h>
 
 NotesSyncer::NotesSyncer(QObject *parent)
@@ -14,10 +13,6 @@ NotesSyncer::NotesSyncer(QObject *parent)
     , db(DB::getInstance())
     , m_notesController(new NotesController(this)) // local handler for notes
 {
-    connect(MauiAccounts::instance(), &MauiAccounts::currentAccountChanged, [&](QVariantMap) {
-        this->getRemoteNotes();
-    });
-
     connect(this->m_notesController, &NotesController::noteReady, this, &NotesSyncer::noteReady);
 }
 

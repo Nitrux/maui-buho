@@ -346,27 +346,27 @@ StackView
         holder.title :i18n("No notes!")
         holder.body: i18n("You can quickly create a new note")
 
-        headBar.leftContent: ToolButton
-        {
-            icon.name: "list-add"
-            onClicked: control.newNote()
-        }
+        headBar.leftContent: [
+            ToolButton
+            {
+                icon.name: "list-add"
+                onClicked: control.newNote()
+            },
 
-        headBar.forceCenterMiddleContent: root.isWide
-        headBar.middleContent: Loader
-        {
-            Layout.fillWidth: true
-            Layout.maximumWidth: 250
-            Layout.alignment: Qt.AlignCenter
-            asynchronous: true
+            ToolSeparator
+            {
+                bottomPadding: 10
+                topPadding: 10
+            },
 
-            sourceComponent: Maui.SearchField
+            Maui.SearchField
             {
                 placeholderText: i18n("Search ") + control.list.count + " " + i18n("notes")
                 onAccepted: control.model.filter = text
                 onCleared: control.model.filter = ""
+                implicitWidth: 250
             }
-        }
+        ]
 
         headBar.rightContent: Maui.ToolButtonMenu
         {

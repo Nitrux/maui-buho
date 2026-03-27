@@ -66,7 +66,6 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE
     MauiKit4
     MauiKit4::FileBrowsing
-    MauiKit4::Accounts
     MauiKit4::TextEditor
     Qt6::Sql
     Qt6::Quick

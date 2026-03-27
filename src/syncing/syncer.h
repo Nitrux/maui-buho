@@ -31,18 +31,6 @@ class Syncer : public QObject
 
 public:
     explicit Syncer(QObject *parent = nullptr);
-    /**
-     * @brief setProviderAccount
-     * sets the credentials to the current account
-     * for the current provider being used
-     * @param account
-     * the account data represented by FMH::MODEL
-     * where the valid keys are:
-     * FMH::MODEL_KEY::USER user name
-     * FMH::MODEL_KEY::PASSWORD users password
-     * FMH::MODEL_KEY::PROVIDER the url to the provider server
-     */
-    void setAccount(const FMH::MODEL &account);
 
     /**
      * @brief setProvider
