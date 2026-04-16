@@ -49,6 +49,8 @@ add_executable(${PROJECT_NAME}
 
 qt_add_qml_module(${PROJECT_NAME} URI app.maui.buho
     NO_PLUGIN
+    NO_IMPORT_SCAN
+    RESOURCE_PREFIX /
     QML_FILES
     main.qml
     widgets/NewNoteDialog.qml

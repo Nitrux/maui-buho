@@ -33,13 +33,6 @@ option(QUICK_COMPILER "Use QtQuick compiler to improve performance" TRUE)
 find_package(ECM ${REQUIRED_KF_VERSION} REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${ECM_MODULE_PATH})
 
-find_package(Qt6 ${REQUIRED_QT_VERSION} REQUIRED NO_MODULE COMPONENTS Qml Quick Sql Network)
-find_package(KF6 ${REQUIRED_KF_VERSION} REQUIRED COMPONENTS I18n CoreAddons)
-
-find_package(MauiKit4 REQUIRED COMPONENTS FileBrowsing TextEditor)
-
-find_package(Qt6 ${REQUIRED_QT_VERSION} REQUIRED NO_MODULE COMPONENTS DBus)
-
 include(KDEInstallDirs)
 include(KDECMakeSettings)
 include(ECMInstallIcons)
@@ -50,6 +43,11 @@ include(KDEClangFormat)
 include(ECMSetupVersion)
 include(ECMSourceVersionControl)
 include(FeatureSummary)
+
+find_package(Qt6 ${REQUIRED_QT_VERSION} REQUIRED NO_MODULE COMPONENTS Qml Quick Sql Network)
+find_package(KF6 ${REQUIRED_KF_VERSION} REQUIRED COMPONENTS I18n CoreAddons)
+find_package(MauiKit4 REQUIRED COMPONENTS FileBrowsing TextEditor)
+find_package(Qt6 ${REQUIRED_QT_VERSION} REQUIRED NO_MODULE COMPONENTS DBus)
 
 if(${ECM_SOURCE_UNDER_VERSION_CONTROL})
     execute_process(
@@ -77,7 +75,7 @@ ecm_setup_version(${BUHO_VERSION}
     VARIABLE_PREFIX BUHO
     VERSION_HEADER "${CMAKE_CURRENT_BINARY_DIR}/buho_version.h")
 
-qt_policy(SET QTP0001 OLD)
+qt_policy(SET QTP0001 NEW)
 qt_policy(SET QTP0004 NEW)
 
 add_subdirectory(src)
