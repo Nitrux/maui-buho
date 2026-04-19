@@ -117,7 +117,6 @@ const QString NotesSyncer::noteStampFromId(const QString &id)
 void NotesSyncer::setConections()
 {
     connect(&this->getProvider(), &AbstractNotesProvider::noteInserted, [&](FMH::MODEL note) {
-        qDebug() << "STAMP ID OF THE NEWLY INSERTED NOTE" << note[FMH::MODEL_KEY::STAMP] << note;
         this->db->insert(OWL::TABLEMAP[OWL::TABLE::NOTES_SYNC], FMH::toMap(FMH::filterModel(note, {FMH::MODEL_KEY::ID, FMH::MODEL_KEY::STAMP, FMH::MODEL_KEY::USER, FMH::MODEL_KEY::SERVER})));
         Q_EMIT this->noteInserted(note, {STATE::TYPE::REMOTE, STATE::STATUS::OK, "Note inserted on the server provider"});
     });
@@ -136,7 +135,6 @@ void NotesSyncer::setConections()
             const auto id = NotesSyncer::noteIdFromStamp(this->getProvider().provider(), note[FMH::MODEL_KEY::STAMP]);
             note[FMH::MODEL_KEY::ID] = id;
             note[FMH::MODEL_KEY::FAVORITE] = note[FMH::MODEL_KEY::FAVORITE] == "true" ? "1" : "0";
-            qDebug() << "REMOTE NOTE MAPPED ID" << id << note[FMH::MODEL_KEY::STAMP];
 
             // if the id is empty then the note does not exists, so the note is inserted locally
             if (id.isEmpty()) {
@@ -159,8 +157,6 @@ void NotesSyncer::setConections()
 
                 auto remoteDate = QDateTime::fromSecsSinceEpoch(note[FMH::MODEL_KEY::MODIFIED].toInt());
                 auto localDate = QFileInfo(QUrl(note[FMH::MODEL_KEY::URL]).toLocalFile()).lastModified();
-
-                qDebug() << "UPDATING FROM REMOTE" << note[FMH::MODEL_KEY::URL] << localDate.secsTo(QDateTime::currentDateTime()) << remoteDate.secsTo(QDateTime::currentDateTime());
 
                 if (remoteDate <= localDate)
                     continue;

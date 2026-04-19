@@ -46,9 +46,6 @@ void NextNote::getNote(const QString &id)
 {
     QUrl relativeUrl("../.." + NextNote::API + QString("notes/%1").arg(id));
     auto url = QUrl(this->m_provider).resolved(relativeUrl);
-#ifndef QT_NO_DEBUG
-    qDebug() << "THE RESOLVED URL IS" << url << this->m_provider;
-#endif
 
 //    const auto request = formRequest(url, this->m_user, this->m_password);
     QString concatenated = this->m_user + ":" + this->m_password;
@@ -82,9 +79,6 @@ void NextNote::getNotes()
 {
     QUrl relativeUrl("../.." + NextNote::API + QString("notes"));
     auto url = QUrl(this->m_provider).resolved(relativeUrl);
-#ifndef QT_NO_DEBUG
-    qDebug() << "THE RESOLVED URL IS" << url << this->m_provider;
-#endif
 
     QString concatenated = this->m_user + ":" + this->m_password;
     QByteArray data = concatenated.toLocal8Bit().toBase64();
@@ -118,9 +112,6 @@ void NextNote::getBooklets()
 {
     QUrl relativeUrl("../.." + NextNote::API + QString("notes"));
     auto url = QUrl(this->m_provider).resolved(relativeUrl);
-#ifndef QT_NO_DEBUG
-    qDebug() << "THE RESOLVED URL IS" << url << this->m_provider;
-#endif
 
     QString concatenated = this->m_user + ":" + this->m_password;
     QByteArray data = concatenated.toLocal8Bit().toBase64();
@@ -156,9 +147,6 @@ void NextNote::insertNote(const FMH::MODEL &note)
 
     QUrl relativeUrl("../.." + NextNote::API + QString("notes"));
     auto url = QUrl(this->m_provider).resolved(relativeUrl);
-#ifndef QT_NO_DEBUG
-    qDebug() << "THE RESOLVED URL IS" << url << this->m_provider;
-#endif
 
     const auto request = formRequest(url, this->m_user, this->m_password);
 
@@ -193,9 +181,6 @@ void NextNote::insertBooklet(const FMH::MODEL &booklet)
 
     QUrl relativeUrl("../.." + NextNote::API + QString("notes"));
     auto url = QUrl(this->m_provider).resolved(relativeUrl);
-#ifndef QT_NO_DEBUG
-    qDebug() << "THE RESOLVED URL IS" << url << this->m_provider;
-#endif
 
     const auto request = formRequest(url, this->m_user, this->m_password);
 
@@ -235,9 +220,6 @@ void NextNote::updateNote(const QString &id, const FMH::MODEL &note)
 
     QUrl relativeUrl("../.." + NextNote::API + QString("notes/%1").arg(id));
     auto url = QUrl(this->m_provider).resolved(relativeUrl);
-#ifndef QT_NO_DEBUG
-    qDebug() << "THE RESOLVED URL IS" << url << this->m_provider;
-#endif
 
     const auto request = formRequest(url, this->m_user, this->m_password);
 
@@ -279,9 +261,6 @@ void NextNote::updateBooklet(const QString &id, const FMH::MODEL &booklet)
 
     QUrl relativeUrl("../.." + NextNote::API + QString("notes/%1").arg(id));
     auto url = QUrl(this->m_provider).resolved(relativeUrl);
-#ifndef QT_NO_DEBUG
-    qDebug() << "THE RESOLVED URL IS" << url << this->m_provider;
-#endif
 
     const auto request = formRequest(url, this->m_user, this->m_password);
 
@@ -322,9 +301,6 @@ void NextNote::removeNote(const QString &id)
 
     QUrl relativeUrl("../.." + NextNote::API + QString("notes/%1").arg(id));
     auto url = QUrl(this->m_provider).resolved(relativeUrl);
-#ifndef QT_NO_DEBUG
-    qDebug() << "THE RESOLVED URL IS" << url << this->m_provider;
-#endif
 
     const auto request = formRequest(url, this->m_user, this->m_password);
     auto restclient = new QNetworkAccessManager; // constructor
@@ -353,7 +329,7 @@ const FMH::MODEL_LIST NextNote::parseNotes(const QByteArray &array)
     QJsonDocument jsonResponse = QJsonDocument::fromJson(array, &jsonParseError);
 
     if (jsonParseError.error != QJsonParseError::NoError) {
-        qDebug() << "ERROR PARSING" << array;
+        qWarning() << "Failed to parse notes response:" << jsonParseError.errorString();
         return res;
     }
 

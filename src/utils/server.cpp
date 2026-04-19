@@ -3,11 +3,59 @@
 #include <QGuiApplication>
 #include <QQuickWindow>
 #include <QQmlApplicationEngine>
+#include <QDBusReply>
+#include <QFileInfo>
+#include <QRegularExpression>
 
 #include <MauiKit4/FileBrowsing/fmstatic.h>
 
 #include "buhointerface.h"
 #include "buhoadaptor.h"
+
+namespace
+{
+QString canonicalPath(const QString &path)
+{
+    const QFileInfo info(path);
+    const auto canonical = info.canonicalFilePath();
+    return canonical.isEmpty() ? info.absoluteFilePath() : canonical;
+}
+
+bool isExpectedServiceName(const QString &service)
+{
+    static const QRegularExpression pattern(QStringLiteral("^org\\.kde\\.buho-[0-9]+$"));
+    return pattern.match(service).hasMatch();
+}
+
+QString serviceExecutablePath(const QString &service)
+{
+    if (!isExpectedServiceName(service))
+        return {};
+
+    auto *sessionInterface = QDBusConnection::sessionBus().interface();
+    if (!sessionInterface)
+        return {};
+
+    const auto owner = sessionInterface->serviceOwner(service);
+    if (!owner.isValid() || owner.value().isEmpty())
+        return {};
+
+    const auto pid = sessionInterface->servicePid(owner.value());
+    if (!pid.isValid() || pid.value() == 0)
+        return {};
+
+    return canonicalPath(QStringLiteral("/proc/%1/exe").arg(pid.value()));
+}
+
+bool isTrustedBuhoService(const QString &service)
+{
+    const auto ownerPath = serviceExecutablePath(service);
+    if (ownerPath.isEmpty())
+        return false;
+
+    return ownerPath == canonicalPath(QCoreApplication::applicationFilePath());
+}
+}
 
 QVector<QPair<QSharedPointer<OrgKdeBuhoActionsInterface>, QStringList>> AppInstance::appInstances(const QString& preferredService)
 {
@@ -20,8 +68,7 @@ QVector<QPair<QSharedPointer<OrgKdeBuhoActionsInterface>, QStringList>> AppInsta
                                                    QStringLiteral("/Actions"),
                                                    QDBusConnection::sessionBus()));
 
-        qDebug() << "IS PREFRFRED INTERFACE VALID?" << preferredInterface->isValid() << preferredInterface->lastError().message();
-        if (preferredInterface->isValid() && !preferredInterface->lastError().isValid()) {
+        if (isTrustedBuhoService(preferredService) && preferredInterface->isValid() && !preferredInterface->lastError().isValid()) {
             dolphinInterfaces.append(qMakePair(preferredInterface, QStringList()));
         }
     }
@@ -37,11 +84,8 @@ QVector<QPair<QSharedPointer<OrgKdeBuhoActionsInterface>, QStringList>> AppInsta
 
     for (const QString& service : dbusServices)
     {
-        if (service.startsWith(pattern) && !service.endsWith(myPid))
+        if (service.startsWith(pattern) && !service.endsWith(myPid) && isTrustedBuhoService(service))
         {
-            qDebug() << "EXISTING INTANCES" << service;
-
-            // Check if instance can handle our URLs
             QSharedPointer<OrgKdeBuhoActionsInterface> interface(
                         new OrgKdeBuhoActionsInterface(service,
                                                        QStringLiteral("/Actions"),
@@ -142,32 +186,43 @@ void Server::setQmlObject(QObject *object)
 
 void Server::activateWindow()
 {
+    if (!this->isTrustedCaller())
+    {
+        qWarning() << "Rejected untrusted D-Bus request to activate Buho";
+        return;
+    }
+
     if(m_qmlObject)
     {
-        qDebug() << "ACTIVET WINDOW FROM C++";
         auto window = qobject_cast<QQuickWindow *>(m_qmlObject);
         if (window)
         {
-            qDebug() << "Trying to raise wndow";
             window->raise();
             window->requestActivate();
         }
     }
 }
 
-void Server::quit()
-{
-    QCoreApplication::quit();
-}
-
 void Server::newNote(const QString &content)
 {
+    if (!this->isTrustedCaller())
+    {
+        qWarning() << "Rejected untrusted D-Bus request to create a note";
+        return;
+    }
+
     if(m_qmlObject)
     {
-
         QMetaObject::invokeMethod(m_qmlObject, "newNote",
-                                  Q_ARG(QString, content));
+                                  Q_ARG(QString, content.left(AppInstance::MaxNoteContentLength)));
 
     }
 }
 
+bool Server::isTrustedCaller() const
+{
+    if (!this->calledFromDBus())
+        return true;
+
+    return isTrustedBuhoService(this->message().service());
+}

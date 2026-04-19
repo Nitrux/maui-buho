@@ -87,7 +87,7 @@ int Q_DECL_EXPORT main(int argc, char *argv[])
     {
         if(parser.isSet(newNoteContent))
         {
-            noteContent = parser.value(newNoteContent).left(1 * 1024 * 1024); // cap at 1 MB
+            noteContent = parser.value(newNoteContent).left(AppInstance::MaxNoteContentLength);
         }
     }
 

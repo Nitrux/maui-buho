@@ -20,8 +20,6 @@ Notes::Notes(QObject *parent)
     this->syncer->setProvider(new NextNote); // Syncer takes ownership of NextNote or the provider
 
     connect(syncer, &NotesSyncer::noteInserted, [&](FMH::MODEL note, STATE state) {
-
-        qDebug() << "Insertint new note" << note;
         if (state.type == STATE::TYPE::LOCAL)
             this->appendNote(note);
     });
@@ -30,10 +28,8 @@ Notes::Notes(QObject *parent)
         if (state.type == STATE::TYPE::LOCAL) {
             const auto index = this->indexOf(FMH::MODEL_KEY::ID, note[FMH::MODEL_KEY::ID]);
             if (index >= 0) {
-                qDebug() << note[FMH::MODEL_KEY::MODIFIED] << index;
                 note.insert(FMStatic::getFileInfoModel(QUrl(note[FMH::MODEL_KEY::URL])));
                 enrichNote(note);
-                qDebug() << note[FMH::MODEL_KEY::MODIFIED];
                 this->notes[index] = note;
                 Q_EMIT this->updateModel(index, {});
             }
@@ -54,7 +50,6 @@ void Notes::enrichNote(FMH::MODEL &note)
 
 void Notes::appendNote(FMH::MODEL note)
 {
-    qDebug() << "APPEND NOTE <<" << note[FMH::MODEL_KEY::ID];
     note[FMH::MODEL_KEY::TITLE] = [&]() {
         const auto lines = note[FMH::MODEL_KEY::CONTENT].split("\n");
         return lines.isEmpty() ? QString() : lines.first().trimmed();
@@ -75,7 +70,6 @@ const FMH::MODEL_LIST &Notes::items() const
 
 QVariantMap Notes::insert(const QVariantMap &note)
 {
-    qDebug() << "Inserting new note" << note;
     auto __note = FMH::toModel(note);
     this->syncer->insertNote(__note);
 
@@ -93,8 +87,6 @@ bool Notes::update(const QVariantMap &data, const int &index)
     //    {
     //        return false;
     //    }
-
-    qDebug() << "UDPATE MODEL ITEM AT "<< index << note[FMH::MODEL_KEY::TITLE];
     note.insert(FMH::toModel(data));
 
     note[FMH::MODEL_KEY::TITLE] = [&]() {

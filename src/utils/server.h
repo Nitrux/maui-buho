@@ -1,10 +1,13 @@
 #pragma once
 #include <QObject>
+#include <QDBusContext>
 
 class OrgKdeBuhoActionsInterface;
 
 namespace AppInstance
 {
+inline constexpr qsizetype MaxNoteContentLength = 1 * 1024 * 1024;
+
 QVector<QPair<QSharedPointer<OrgKdeBuhoActionsInterface>, QStringList>> appInstances(const QString& preferredService);
 
 bool attachToExistingInstance(bool newNote = false, const QString &content = "");
@@ -12,7 +15,7 @@ bool attachToExistingInstance(bool newNote = false, const QString &content = "")
 bool registerService();
 }
 
-class Server : public QObject
+class Server : public QObject, protected QDBusContext
 {
     Q_OBJECT
     Q_CLASSINFO("D-Bus Interface", "org.kde.buho.Actions")
@@ -27,14 +30,11 @@ public Q_SLOTS:
            */
     void activateWindow();
 
-    /** Stores all settings and quits Dolphin. */
-    void quit();
-
     void newNote(const QString &content = "");
 
 
 private:
+    bool isTrustedCaller() const;
     QObject* m_qmlObject = nullptr;
 
 };
-
