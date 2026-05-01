@@ -197,7 +197,7 @@ Maui.Page
         anchors.fill: parent
         orientation: control.height > control.width ? Qt.Vertical : Qt.Horizontal
 
-        TE.TextEditor
+        TE.SimpleTextEditor
         {
             id: _editor
             SplitView.fillWidth: control.height <= control.width
