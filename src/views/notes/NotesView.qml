@@ -330,6 +330,7 @@ StackView
     {
         id: cardsView
         background: null
+        readonly property bool useSplitToolBars: height > width
 
         Maui.Controls.showCSD: true
 
@@ -340,9 +341,10 @@ StackView
 
         viewType: control.width > Maui.Style.units.gridUnit * 30 ? Maui.AltBrowser.ViewType.Grid : Maui.AltBrowser.ViewType.List
 
-        floatingFooter: true
-        altHeader: Maui.Handy.isMobile
+        floatingFooter: cardsView.useSplitToolBars
+        altHeader: Maui.Handy.isMobile && !cardsView.useSplitToolBars
         headerMargins: Maui.Style.defaultPadding
+        footerMargins: cardsView.useSplitToolBars ? Maui.Style.defaultPadding : 0
         holder.visible: notesList.count === 0 || cardsView.count === 0
         holder.emoji: "qrc:/view-notes.svg"
         holder.title :i18n("No notes!")
@@ -363,6 +365,7 @@ StackView
 
             Maui.SearchField
             {
+                visible: !cardsView.useSplitToolBars
                 placeholderText: i18n("Search ") + control.list.count + " " + i18n("notes")
                 onAccepted: control.model.filter = text
                 onCleared: control.model.filter = ""
@@ -370,10 +373,47 @@ StackView
             }
         ]
 
+        headBar.middleContent: Maui.SearchField
+        {
+            visible: cardsView.useSplitToolBars
+            Layout.fillWidth: true
+            placeholderText: i18n("Search ") + control.list.count + " " + i18n("notes")
+            onAccepted: control.model.filter = text
+            onCleared: control.model.filter = ""
+        }
+
         headBar.rightContent: [
+
+            ToolSeparator
+            {
+                visible: cardsView.useSplitToolBars
+                bottomPadding: 10
+                topPadding: 10
+            },
+
+            Maui.ToolButtonMenu
+            {
+                visible: cardsView.useSplitToolBars
+                icon.name: "overflow-menu"
+
+                MenuItem
+                {
+                    text: i18n("Preferences")
+                    icon.name: "settings-configure"
+                    onTriggered: _settingsDialog.open()
+                }
+
+                MenuItem
+                {
+                    text: i18n("About")
+                    icon.name: "documentinfo"
+                    onTriggered: Maui.App.aboutDialog()
+                }
+            },
 
             Label
             {
+                visible: !cardsView.useSplitToolBars
                 text: i18n("Sort")
                 font.weight: Font.DemiBold
                 verticalAlignment: Text.AlignVCenter
@@ -382,6 +422,7 @@ StackView
             ComboBox
             {
                 id: _sortComboBox
+                visible: !cardsView.useSplitToolBars
                 implicitWidth: 180
                 currentIndex: 0
 
@@ -410,12 +451,14 @@ StackView
 
             ToolSeparator
             {
+                visible: !cardsView.useSplitToolBars
                 bottomPadding: 10
                 topPadding: 10
             },
 
             Maui.ToolButtonMenu
             {
+                visible: !cardsView.useSplitToolBars
                 icon.name: "overflow-menu"
 
                 MenuItem
@@ -430,6 +473,52 @@ StackView
                     text: i18n("About")
                     icon.name: "documentinfo"
                     onTriggered: Maui.App.aboutDialog()
+                }
+            }
+        ]
+
+        footerColumn: [
+            Maui.ToolBar
+            {
+                visible: cardsView.useSplitToolBars
+                width: parent.width
+                position: ToolBar.Footer
+                background: Rectangle
+                {
+                    color: Maui.Theme.backgroundColor
+                    radius: Maui.Style.radiusV
+                    border.color: Maui.Theme.alternateBackgroundColor
+                    border.pixelAligned: false
+                    antialiasing: true
+                }
+
+                middleContent: RowLayout
+                {
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    spacing: Maui.Style.space.small
+
+                    Label
+                    {
+                        text: i18n("Sort")
+                        font.weight: Font.DemiBold
+                        verticalAlignment: Text.AlignVCenter
+                    }
+
+                    ComboBox
+                    {
+                        implicitWidth: 180
+                        currentIndex: _sortComboBox.currentIndex
+
+                        model: _sortComboBox.model
+                        readonly property var _sorts: _sortComboBox._sorts
+
+                        onActivated: (index) =>
+                        {
+                            _sortComboBox.currentIndex = index
+                            notesModel.sort = _sorts[index].sort
+                            notesModel.sortOrder = _sorts[index].order
+                        }
+                    }
                 }
             }
         ]
@@ -817,4 +906,3 @@ StackView
         }
     }
 }
-

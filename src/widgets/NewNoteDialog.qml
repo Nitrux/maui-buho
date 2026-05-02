@@ -20,9 +20,12 @@ Maui.Page
     showTitle: false
 
     property alias text: _editor.text
+    readonly property bool useSplitToolBars: control.height > control.width
 
     signal noteSaved(var note, int noteIndex)
+    floatingFooter: control.useSplitToolBars
     headerMargins: Maui.Style.defaultPadding
+    footerMargins: control.useSplitToolBars ? Maui.Style.defaultPadding : 0
 
     headBar.visible: !editor.body.readOnly
     headBar.leftContent: [
@@ -53,8 +56,81 @@ Maui.Page
 
         ComboBox
         {
+            visible: !control.useSplitToolBars
             model: [i18n("Body"), i18n("Heading 1"), i18n("Heading 2"), i18n("Heading 3"), i18n("Heading 4")]
             onActivated: (index) => control.setHeading(index)
+        },
+
+        ToolSeparator
+        {
+            visible: !control.useSplitToolBars
+            bottomPadding: 10
+            topPadding: 10
+        },
+
+        ToolButton
+        {
+            visible: !control.useSplitToolBars
+            icon.name: "insert-link"
+            onClicked:
+            {
+                _linkText.text = _editor.body.selectedText
+                _linkUrl.text = ""
+                _linkDialog.open()
+            }
+        },
+
+        ToolButton
+        {
+            visible: !control.useSplitToolBars
+            icon.name: "insert-image"
+            onClicked: _imagePicker.open()
+        },
+
+        ToolSeparator
+        {
+            visible: !control.useSplitToolBars
+            bottomPadding: 10
+            topPadding: 10
+        },
+
+        ToolButton
+        {
+            visible: !control.useSplitToolBars
+            icon.name: "format-list-ordered"
+            onClicked: control.prefixLine("1. ")
+        },
+
+        ToolButton
+        {
+            visible: !control.useSplitToolBars
+            icon.name: "format-list-unordered"
+            onClicked: control.prefixLine("- ")
+        },
+
+        ToolSeparator
+        {
+            visible: !control.useSplitToolBars
+            bottomPadding: 10
+            topPadding: 10
+        },
+
+        ToolButton
+        {
+            visible: !control.useSplitToolBars
+            icon.name: "edit-clear"
+            onClicked: control.clearFormat()
+        }
+    ]
+
+    headBar.rightContent: [
+
+        ToolButton
+        {
+            id: _previewButton
+            icon.name: control.height > control.width ? "view-split-top-bottom" : "view-split-left-right"
+            checkable: true
+            checked: true
         },
 
         ToolSeparator
@@ -62,6 +138,18 @@ Maui.Page
             bottomPadding: 10
             topPadding: 10
         },
+
+        ToolButton
+        {
+            icon.name: "edit-find"
+            checkable: true
+            checked: editor.showFindBar
+            onClicked: editor.showFindBar = !editor.showFindBar
+        }
+    ]
+
+    footBar.visible: !editor.body.readOnly && control.useSplitToolBars
+    footBar.leftContent: [
 
         ToolButton
         {
@@ -104,35 +192,18 @@ Maui.Page
             topPadding: 10
         },
 
+        ComboBox
+        {
+            model: [i18n("Body"), i18n("Heading 1"), i18n("Heading 2"), i18n("Heading 3"), i18n("Heading 4")]
+            onActivated: (index) => control.setHeading(index)
+        }
+    ]
+
+    footBar.rightContent: [
         ToolButton
         {
             icon.name: "edit-clear"
             onClicked: control.clearFormat()
-        }
-    ]
-
-    headBar.rightContent: [
-
-        ToolButton
-        {
-            id: _previewButton
-            icon.name: control.height > control.width ? "view-split-top-bottom" : "view-split-left-right"
-            checkable: true
-            checked: true
-        },
-
-        ToolSeparator
-        {
-            bottomPadding: 10
-            topPadding: 10
-        },
-
-        ToolButton
-        {
-            icon.name: "edit-find"
-            checkable: true
-            checked: editor.showFindBar
-            onClicked: editor.showFindBar = !editor.showFindBar
         }
     ]
 
@@ -338,6 +409,7 @@ Maui.Page
             var start = body.selectionStart
             var cleaned = body.selectedText
                 .replace(/\*\*(.*?)\*\*/g, "$1")
+                .replace(/`([^`]*)`/g, "$1")
                 .replace(/\*(.*?)\*/g, "$1")
                 .replace(/_(.*?)_/g, "$1")
                 .replace(/~~(.*?)~~/g, "$1")
