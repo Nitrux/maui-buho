@@ -42,7 +42,6 @@ Maui.ApplicationWindow
     Settings
     {
         id: settings
-        category: "General"
         property bool autoSave: true
         property bool autoReload: true
 
