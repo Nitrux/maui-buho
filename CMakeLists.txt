@@ -35,9 +35,9 @@ set(CMAKE_AUTORCC ON)
 
 #set(TESSDATA_PREFIX /usr/share/tessdata)
 set(QT_MAJOR_VERSION 6)
-set(REQUIRED_QT_VERSION 6.5.2)
+set(REQUIRED_QT_VERSION 6.9)
 
-set(REQUIRED_KF_VERSION 5.240.0)
+set(REQUIRED_KF_VERSION 6.13.0)
 
 option(QUICK_COMPILER "Use QtQuick compiler to improve performance" TRUE)
 
@@ -57,7 +57,7 @@ include(FeatureSummary)
 
 find_package(Qt6 ${REQUIRED_QT_VERSION} REQUIRED NO_MODULE COMPONENTS Qml Quick Sql Network)
 find_package(KF6 ${REQUIRED_KF_VERSION} REQUIRED COMPONENTS I18n CoreAddons)
-find_package(MauiKit4 REQUIRED COMPONENTS FileBrowsing TextEditor)
+find_package(MauiKit4 4.0.3 REQUIRED COMPONENTS FileBrowsing TextEditor)
 find_package(Qt6 ${REQUIRED_QT_VERSION} REQUIRED NO_MODULE COMPONENTS DBus)
 
 if(${ECM_SOURCE_UNDER_VERSION_CONTROL})
