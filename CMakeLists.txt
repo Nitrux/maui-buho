@@ -5,7 +5,7 @@
 
 cmake_minimum_required(VERSION 3.16)
 
-set(BUHO_VERSION 4.0.3)
+set(BUHO_VERSION 4.0.4)
 add_compile_definitions(APP_COPYRIGHT_NOTICE="© 2019-2025 Maui Development Team")
 
 project(buho VERSION ${BUHO_VERSION})
@@ -57,7 +57,7 @@ include(FeatureSummary)
 
 find_package(Qt6 ${REQUIRED_QT_VERSION} REQUIRED NO_MODULE COMPONENTS Qml Quick Sql Network)
 find_package(KF6 ${REQUIRED_KF_VERSION} REQUIRED COMPONENTS I18n CoreAddons)
-find_package(MauiKit4 4.0.3 REQUIRED COMPONENTS FileBrowsing TextEditor)
+find_package(MauiKit4 4.0.4 REQUIRED COMPONENTS FileBrowsing TextEditor)
 find_package(Qt6 ${REQUIRED_QT_VERSION} REQUIRED NO_MODULE COMPONENTS DBus)
 
 if(${ECM_SOURCE_UNDER_VERSION_CONTROL})
