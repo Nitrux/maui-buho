@@ -38,6 +38,7 @@ set(QT_MAJOR_VERSION 6)
 set(REQUIRED_QT_VERSION 6.9)
 
 set(REQUIRED_KF_VERSION 6.13.0)
+set(REQUIRED_MAUIKIT_VERSION 4.0.4)
 
 option(QUICK_COMPILER "Use QtQuick compiler to improve performance" TRUE)
 
@@ -57,7 +58,7 @@ include(FeatureSummary)
 
 find_package(Qt6 ${REQUIRED_QT_VERSION} REQUIRED NO_MODULE COMPONENTS Qml Quick Sql Network)
 find_package(KF6 ${REQUIRED_KF_VERSION} REQUIRED COMPONENTS I18n CoreAddons)
-find_package(MauiKit4 4.0.4 REQUIRED COMPONENTS FileBrowsing TextEditor)
+find_package(MauiKit4 ${REQUIRED_MAUIKIT_VERSION} REQUIRED COMPONENTS FileBrowsing TextEditor)
 find_package(Qt6 ${REQUIRED_QT_VERSION} REQUIRED NO_MODULE COMPONENTS DBus)
 
 if(${ECM_SOURCE_UNDER_VERSION_CONTROL})
