@@ -14,7 +14,28 @@ StackView
     id: control
     background: null
 
+    property var windowRoot : null
     property var currentNote : ({})
+
+    Action
+    {
+        id: _newNoteAction
+        text: i18n("New Note")
+        icon.name: "list-add"
+        shortcut: "Ctrl+N"
+        enabled: control.depth <= 1
+        onTriggered: newNote()
+    }
+
+    Action
+    {
+        id: _pasteAction
+        text: i18n("Paste")
+        icon.name: "edit-paste"
+        shortcut: "Ctrl+V"
+        enabled: control.depth <= 1
+        onTriggered: newNote(Maui.Handy.getClipboardText())
+    }
 
     property alias cardsView : cardsView
 
@@ -75,18 +96,6 @@ StackView
         }
     }
 
-    Action
-    {
-        id: _pasteAction
-        text: i18n("Paste")
-        icon.name: "edit-paste"
-        shortcut: "Ctrl+V"
-        onTriggered:
-        {
-            console.log("PASTE NOTE FROM CLIPBOARD")
-            newNote(Maui.Handy.getClipboardText())
-        }
-    }
 
     Component
     {
@@ -400,7 +409,14 @@ StackView
                 {
                     text: i18n("Preferences")
                     icon.name: "settings-configure"
-                    onTriggered: _settingsDialog.open()
+                    onTriggered: windowRoot.openSettingsDialog()
+                }
+
+                MenuItem
+                {
+                    text: i18n("Shortcuts")
+                    icon.name: "configure-shortcuts"
+                    onTriggered: windowRoot.openShortcutsDialog()
                 }
 
                 MenuItem
@@ -465,7 +481,14 @@ StackView
                 {
                     text: i18n("Preferences")
                     icon.name: "settings-configure"
-                    onTriggered: _settingsDialog.open()
+                    onTriggered: windowRoot.openSettingsDialog()
+                }
+
+                MenuItem
+                {
+                    text: i18n("Shortcuts")
+                    icon.name: "configure-shortcuts"
+                    onTriggered: windowRoot.openShortcutsDialog()
                 }
 
                 MenuItem

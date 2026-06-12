@@ -27,6 +27,94 @@ Maui.Page
     headerMargins: Maui.Style.defaultPadding
     footerMargins: control.useSplitToolBars ? Maui.Style.defaultPadding : 0
 
+    Action
+    {
+        id: _boldAction
+        icon.name: "format-text-bold"
+        shortcut: "Ctrl+B"
+        onTriggered: control.wrapSelection("**", "**")
+    }
+
+    Action
+    {
+        id: _italicAction
+        icon.name: "format-text-italic"
+        shortcut: "Ctrl+I"
+        onTriggered: control.wrapSelection("*", "*")
+    }
+
+    Action
+    {
+        id: _underlineAction
+        icon.name: "format-text-underline"
+        shortcut: "Ctrl+U"
+        onTriggered: control.wrapSelection("<u>", "</u>")
+    }
+
+    Action
+    {
+        id: _linkAction
+        icon.name: "insert-link"
+        shortcut: "Ctrl+L"
+        onTriggered:
+        {
+            _linkText.text = _editor.body.selectedText
+            _linkUrl.text = ""
+            _linkDialog.open()
+        }
+    }
+
+    Action
+    {
+        id: _imageAction
+        icon.name: "insert-image"
+        shortcut: "Ctrl+Shift+I"
+        onTriggered: _imagePicker.open()
+    }
+
+    Action
+    {
+        id: _orderedListAction
+        icon.name: "format-list-ordered"
+        shortcut: "Ctrl+Shift+7"
+        onTriggered: control.prefixLine("1. ")
+    }
+
+    Action
+    {
+        id: _unorderedListAction
+        icon.name: "format-list-unordered"
+        shortcut: "Ctrl+Shift+8"
+        onTriggered: control.prefixLine("- ")
+    }
+
+    Action
+    {
+        id: _clearFormatAction
+        icon.name: "edit-clear"
+        shortcut: "Ctrl+Shift+0"
+        onTriggered: control.clearFormat()
+    }
+
+    Action
+    {
+        id: _previewAction
+        icon.name: control.height > control.width ? "view-split-top-bottom" : "view-split-left-right"
+        checkable: true
+        checked: true
+        shortcut: "F9"
+        onTriggered: checked = !checked
+    }
+
+    Action
+    {
+        id: _findAction
+        icon.name: "edit-find"
+        checkable: true
+        shortcut: "Ctrl+F"
+        onTriggered: editor.showFindBar = !editor.showFindBar
+    }
+
     headBar.visible: !editor.body.readOnly
     headBar.leftContent: [
 
@@ -38,20 +126,17 @@ Maui.Page
 
         ToolButton
         {
-            icon.name: "format-text-bold"
-            onClicked: control.wrapSelection("**", "**")
+            action: _boldAction
         },
 
         ToolButton
         {
-            icon.name: "format-text-italic"
-            onClicked: control.wrapSelection("*", "*")
+            action: _italicAction
         },
 
         ToolButton
         {
-            icon.name: "format-text-underline"
-            onClicked: control.wrapSelection("<u>", "</u>")
+            action: _underlineAction
         },
 
         ComboBox
@@ -71,20 +156,13 @@ Maui.Page
         ToolButton
         {
             visible: !control.useSplitToolBars
-            icon.name: "insert-link"
-            onClicked:
-            {
-                _linkText.text = _editor.body.selectedText
-                _linkUrl.text = ""
-                _linkDialog.open()
-            }
+            action: _linkAction
         },
 
         ToolButton
         {
             visible: !control.useSplitToolBars
-            icon.name: "insert-image"
-            onClicked: _imagePicker.open()
+            action: _imageAction
         },
 
         ToolSeparator
@@ -97,15 +175,13 @@ Maui.Page
         ToolButton
         {
             visible: !control.useSplitToolBars
-            icon.name: "format-list-ordered"
-            onClicked: control.prefixLine("1. ")
+            action: _orderedListAction
         },
 
         ToolButton
         {
             visible: !control.useSplitToolBars
-            icon.name: "format-list-unordered"
-            onClicked: control.prefixLine("- ")
+            action: _unorderedListAction
         },
 
         ToolSeparator
@@ -118,8 +194,7 @@ Maui.Page
         ToolButton
         {
             visible: !control.useSplitToolBars
-            icon.name: "edit-clear"
-            onClicked: control.clearFormat()
+            action: _clearFormatAction
         }
     ]
 
@@ -127,10 +202,7 @@ Maui.Page
 
         ToolButton
         {
-            id: _previewButton
-            icon.name: control.height > control.width ? "view-split-top-bottom" : "view-split-left-right"
-            checkable: true
-            checked: true
+            action: _previewAction
         },
 
         ToolSeparator
@@ -141,10 +213,7 @@ Maui.Page
 
         ToolButton
         {
-            icon.name: "edit-find"
-            checkable: true
-            checked: editor.showFindBar
-            onClicked: editor.showFindBar = !editor.showFindBar
+            action: _findAction
         }
     ]
 
@@ -153,19 +222,12 @@ Maui.Page
 
         ToolButton
         {
-            icon.name: "insert-link"
-            onClicked:
-            {
-                _linkText.text = _editor.body.selectedText
-                _linkUrl.text = ""
-                _linkDialog.open()
-            }
+            action: _linkAction
         },
 
         ToolButton
         {
-            icon.name: "insert-image"
-            onClicked: _imagePicker.open()
+            action: _imageAction
         },
 
         ToolSeparator
@@ -176,14 +238,12 @@ Maui.Page
 
         ToolButton
         {
-            icon.name: "format-list-ordered"
-            onClicked: control.prefixLine("1. ")
+            action: _orderedListAction
         },
 
         ToolButton
         {
-            icon.name: "format-list-unordered"
-            onClicked: control.prefixLine("- ")
+            action: _unorderedListAction
         },
 
         ToolSeparator
@@ -202,8 +262,7 @@ Maui.Page
     footBar.rightContent: [
         ToolButton
         {
-            icon.name: "edit-clear"
-            onClicked: control.clearFormat()
+            action: _clearFormatAction
         }
     ]
 
@@ -326,7 +385,7 @@ Maui.Page
         ScrollView
         {
             id: _previewPane
-            visible: _previewButton.checked
+            visible: _previewAction.checked
             SplitView.preferredWidth: control.height <= control.width ? parent.width / 2 : 0
             SplitView.preferredHeight: control.height > control.width ? parent.height / 2 : 0
             SplitView.minimumWidth: (control.height <= control.width && visible) ? 200 : 0

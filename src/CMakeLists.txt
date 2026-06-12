@@ -57,7 +57,8 @@ qt_add_qml_module(${PROJECT_NAME} URI app.maui.buho
     views/notes/NotesView.qml
     widgets/CardDelegate.qml
     widgets/ColorsBar.qml
-    widgets/SettingsDialog.qml)
+    widgets/SettingsDialog.qml
+    widgets/ShortcutsDialog.qml)
 
 
 target_link_libraries(${PROJECT_NAME}

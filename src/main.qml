@@ -53,14 +53,31 @@ Maui.ApplicationWindow
         id: _settingsDialog
     }
 
+    ShortcutsDialog
+    {
+        id: _shortcutsDialog
+    }
+
     NotesView
     {
         id: notesView
         anchors.fill: parent
+        windowRoot: root
     }
 
     function newNote(content : string)
     {
         notesView.newNote(content)
     }
+
+    function openSettingsDialog()
+    {
+        _settingsDialog.open()
+    }
+
+    function openShortcutsDialog()
+    {
+        _shortcutsDialog.open()
+    }
+
 }
