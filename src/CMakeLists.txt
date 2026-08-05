@@ -78,11 +78,11 @@ target_link_libraries(${PROJECT_NAME}
     KF6::I18n)
 
 install(TARGETS buho ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
-install(FILES org.kde.buho.desktop DESTINATION ${KDE_INSTALL_APPDIR})
+install(FILES org.maui.buho.desktop DESTINATION ${KDE_INSTALL_APPDIR})
 
 #TODO: port to ecm_install_icons()
 install(FILES assets/buho.svg DESTINATION ${KDE_INSTALL_ICONDIR}/hicolor/scalable/apps)
-install(FILES org.kde.buho.metainfo.xml DESTINATION ${KDE_INSTALL_METAINFODIR})
+install(FILES org.maui.buho.metainfo.xml DESTINATION ${KDE_INSTALL_METAINFODIR})
 
 qt_finalize_target(${PROJECT_NAME})
 
