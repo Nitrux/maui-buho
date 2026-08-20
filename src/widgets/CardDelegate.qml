@@ -41,23 +41,22 @@ background: Rectangle
     color: control.isCurrentItem || control.hovered || control.containsPress ? Qt.rgba(control.Maui.Theme.highlightColor.r, control.Maui.Theme.highlightColor.g, control.Maui.Theme.highlightColor.b, 0.2) : control.Maui.Theme.backgroundColor
     radius: control.cardRadius
 
-    Maui.ShadowedRectangle
+    Item
     {
         id: _tagColor
-        visible:  model.color && model.color.length
-        color: visible ? model.color : "transparent"
-
+        visible: model.color && model.color.length
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         width: visible ? 12 : 0
+        clip: true
 
-        corners
+        Rectangle
         {
-            topLeftRadius: control.cardRadius
-            topRightRadius: 0
-            bottomLeftRadius: control.cardRadius
-            bottomRightRadius: 0
+            anchors.fill: parent
+            anchors.rightMargin: -control.cardRadius
+            color: model.color
+            radius: control.cardRadius
         }
     }
 

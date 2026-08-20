@@ -504,7 +504,7 @@ StackView
             Maui.ToolBar
             {
                 visible: cardsView.useSplitToolBars
-                width: parent.width
+                width: cardsView.width
                 position: ToolBar.Footer
                 background: Rectangle
                 {
@@ -631,7 +631,7 @@ StackView
         {
             id: _selectionbar
             anchors.horizontalCenter: parent.horizontalCenter
-            width: Math.min(parent.width-(Maui.Style.space.medium*2), implicitWidth)
+            width: Math.max(0, Math.min(cardsView.width-(Maui.Style.space.medium*2), implicitWidth))
 
             maxListHeight: control.height - Maui.Style.space.medium
             display: ToolButton.IconOnly
@@ -682,7 +682,7 @@ StackView
             Action
             {
                 text: i18n("Delete")
-                Maui.Theme.textColor: Maui.Theme.negativeTextColor
+                Maui.Controls.status: Maui.Controls.Negative
                 icon.name: "edit-delete"
 
                 onTriggered:
@@ -864,14 +864,7 @@ StackView
             }
         }
 
-        Connections
-        {
-            target: cardsView.holder
-            function onActionTriggered()
-            {
-                newNote()
-            }
-        }
+        holder.actions: [_newNoteAction]
 
         Maui.ContextualMenu
         {
@@ -892,7 +885,7 @@ StackView
             {
                 icon.name: "edit-delete"
                 text: i18n("Remove")
-                Maui.Theme.textColor: Maui.Theme.negativeTextColor
+                Maui.Controls.status: Maui.Controls.Negative
                 onTriggered:
                 {
                     notesList.remove(notesModel.mappedToSource(cardsView.currentIndex))
@@ -907,7 +900,7 @@ StackView
                 id: colorBar
                 padding: control.padding
                 width: parent.width
-                currentColor: currentNote.color
+                currentColor: currentNote.color || ""
                 onColorPicked:
                 {
                     notesList.update(({"color": color}), notesModel.mappedToSource(cardsView.currentIndex))
