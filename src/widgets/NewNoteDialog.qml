@@ -103,7 +103,6 @@ Maui.Page
         checkable: true
         checked: true
         shortcut: "F9"
-        onTriggered: checked = !checked
     }
 
     Action
