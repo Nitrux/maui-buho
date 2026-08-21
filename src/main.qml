@@ -44,6 +44,7 @@ Maui.ApplicationWindow
         id: settings
         property bool autoSave: true
         property bool autoReload: true
+        property bool preview: true
 
         property font font : defaultFont
     }

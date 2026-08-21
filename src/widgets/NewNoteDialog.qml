@@ -101,8 +101,9 @@ Maui.Page
         id: _previewAction
         icon.name: control.height > control.width ? "view-split-top-bottom" : "view-split-left-right"
         checkable: true
-        checked: true
+        checked: settings.preview
         shortcut: "F9"
+        onTriggered: settings.preview = checked
     }
 
     Action
