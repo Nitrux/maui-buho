@@ -355,7 +355,7 @@ StackView
         headerMargins: Maui.Style.defaultPadding
         footerMargins: cardsView.useSplitToolBars ? Maui.Style.defaultPadding : 0
         holder.visible: notesList.count === 0 || cardsView.count === 0
-        holder.emoji: "qrc:/view-notes.svg"
+        holder.emoji: "view-pim-notes"
         holder.title :i18n("No notes!")
         holder.body: i18n("You can quickly create a new note")
 
@@ -863,8 +863,6 @@ StackView
                 }
             }
         }
-
-        holder.actions: [_newNoteAction]
 
         Maui.ContextualMenu
         {
