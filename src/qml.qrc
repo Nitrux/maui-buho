@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/app/maui/buho">
+        <file>main.qml</file>
+        <file>widgets/NewNoteDialog.qml</file>
+        <file>views/notes/NotesView.qml</file>
+        <file>widgets/CardDelegate.qml</file>
+        <file>widgets/ColorsBar.qml</file>
+        <file>widgets/SettingsDialog.qml</file>
+        <file>widgets/ShortcutsDialog.qml</file>
+    </qresource>
+</RCC>

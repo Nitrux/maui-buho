@@ -6,6 +6,7 @@
 #include <QDir>
 
 #include <KLocalizedString>
+#include <KLocalizedQmlContext>
 
 #include <MauiKit4/Core/mauiapp.h>
 #include <MauiKit4/TextEditor/moduleinfo.h>
@@ -13,7 +14,7 @@
 #include <QGuiApplication>
 #include <QSurfaceFormat>
 
-#include "../buho_version.h"
+#include "buho_version.h"
 
 #include "owl.h"
 #include "models/notes/notes.h"
@@ -119,7 +120,7 @@ int Q_DECL_EXPORT main(int argc, char *argv[])
         },
         Qt::QueuedConnection);
 
-    engine.rootContext()->setContextObject(new KLocalizedContext(&engine));
+    engine.rootContext()->setContextObject(new KLocalizedQmlContext(&engine));
 
     qmlRegisterType<Notes>(BUHO_URI, 1, 0, "Notes");
 

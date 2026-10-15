@@ -50,7 +50,7 @@ void NextNote::getNote(const QString &id)
 //    const auto request = formRequest(url, this->m_user, this->m_password);
     QString concatenated = this->m_user + ":" + this->m_password;
     QByteArray data = concatenated.toLocal8Bit().toBase64();
-    const auto headerData = QStringLiteral("Basic ") + QByteArrayView(data);
+    const auto headerData = QStringLiteral("Basic ") + QString::fromLatin1(data);
 
     QMap<QString, QString> header{{"Authorization", headerData}};
 
@@ -82,7 +82,7 @@ void NextNote::getNotes()
 
     QString concatenated = this->m_user + ":" + this->m_password;
     QByteArray data = concatenated.toLocal8Bit().toBase64();
-    QString headerData = QStringLiteral("Basic ") + QByteArrayView(data);
+    QString headerData = QStringLiteral("Basic ") + QString::fromLatin1(data);
 
     QMap<QString, QString> header{{"Authorization", headerData}};
 
@@ -115,7 +115,7 @@ void NextNote::getBooklets()
 
     QString concatenated = this->m_user + ":" + this->m_password;
     QByteArray data = concatenated.toLocal8Bit().toBase64();
-    QString headerData = QStringLiteral("Basic ") + QByteArrayView(data);
+    QString headerData = QStringLiteral("Basic ") + QString::fromLatin1(data);
 
     QMap<QString, QString> header{{"Authorization", headerData}};
 

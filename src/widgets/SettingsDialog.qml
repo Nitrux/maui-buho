@@ -20,6 +20,7 @@ Maui.SettingsDialog
             Maui.FontPicker
             {
                 Layout.fillWidth: true
+                showStyle: false
 
                 mfont: settings.font
 

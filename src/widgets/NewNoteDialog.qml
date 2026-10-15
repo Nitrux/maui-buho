@@ -380,6 +380,42 @@ Maui.Page
                     _notifyTimer.start()
                 }
             }
+
+            Maui.ContextualMenu
+            {
+                id: _editorContextMenu
+
+                MenuItem
+                {
+                    text: i18n("Copy")
+                    icon.name: "edit-copy"
+                    enabled: _editor.body.selectedText.length > 0
+                    onTriggered: _editor.body.copy()
+                }
+
+                MenuItem
+                {
+                    text: i18n("Cut")
+                    icon.name: "edit-cut"
+                    enabled: !_editor.body.readOnly && _editor.body.selectedText.length > 0
+                    onTriggered: _editor.body.cut()
+                }
+
+                MenuItem
+                {
+                    text: i18n("Paste")
+                    icon.name: "edit-paste"
+                    enabled: !_editor.body.readOnly
+                    onTriggered: _editor.body.paste()
+                }
+            }
+
+            TapHandler
+            {
+                parent: _editor.body
+                acceptedButtons: Qt.RightButton
+                onTapped: (eventPoint) => _editorContextMenu.popup(eventPoint.position.x, eventPoint.position.y)
+            }
         }
 
         ScrollView
