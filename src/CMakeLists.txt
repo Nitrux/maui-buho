@@ -75,7 +75,8 @@ target_link_libraries(${PROJECT_NAME}
     Qt6::Qml
     Qt6::Network
     KF6::CoreAddons
-    KF6::I18n)
+    KF6::I18n
+    KF6::I18nQml)
 
 install(TARGETS buho ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
 install(FILES org.maui.buho.desktop DESTINATION ${KDE_INSTALL_APPDIR})
