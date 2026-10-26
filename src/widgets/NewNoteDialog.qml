@@ -26,6 +26,12 @@ Maui.Page
     floatingFooter: control.useSplitToolBars
     headerMargins: Maui.Style.defaultPadding
     footerMargins: control.useSplitToolBars ? Maui.Style.defaultPadding : 0
+    headBar.preferredHeight: Maui.Style.rowHeightAlt
+    headBar.topPadding: Maui.Style.defaultPadding
+    headBar.bottomPadding: Maui.Style.defaultPadding
+    footBar.preferredHeight: Maui.Style.rowHeightAlt
+    footBar.topPadding: Maui.Style.defaultPadding
+    footBar.bottomPadding: Maui.Style.defaultPadding
 
     Action
     {

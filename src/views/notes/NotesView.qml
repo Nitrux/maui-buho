@@ -351,6 +351,12 @@ StackView
         viewType: control.width > Maui.Style.units.gridUnit * 30 ? Maui.AltBrowser.ViewType.Grid : Maui.AltBrowser.ViewType.List
 
         floatingFooter: cardsView.useSplitToolBars
+        headBar.preferredHeight: Maui.Style.rowHeightAlt
+        headBar.topPadding: Maui.Style.defaultPadding
+        headBar.bottomPadding: Maui.Style.defaultPadding
+        footBar.preferredHeight: Maui.Style.rowHeightAlt
+        footBar.topPadding: Maui.Style.defaultPadding
+        footBar.bottomPadding: Maui.Style.defaultPadding
         altHeader: Maui.Handy.isMobile && !cardsView.useSplitToolBars
         headerMargins: Maui.Style.defaultPadding
         footerMargins: cardsView.useSplitToolBars ? Maui.Style.defaultPadding : 0
