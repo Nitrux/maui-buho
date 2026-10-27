@@ -278,7 +278,7 @@ Maui.Page
         parent: Overlay.overlay
         anchors.centerIn: parent
         title: i18n("Insert Link")
-        width: Math.min(400, control.width * 0.8)
+        width: Math.min(Maui.Style.units.gridUnit * 25, control.width * 0.8)
         standardButtons: Dialog.Ok | Dialog.Cancel
 
         ColumnLayout

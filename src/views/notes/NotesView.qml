@@ -177,6 +177,7 @@ StackView
                     Action
                     {
                         text: i18n("Save")
+                        Maui.Controls.status: Maui.Controls.Positive
                         onTriggered:
                         {
                             _note.saveNote()
@@ -188,7 +189,7 @@ StackView
                     Action
                     {
                         Maui.Controls.status: Maui.Controls.Negative
-                        text: "Discard"
+                        text: i18n("Discard")
                         onTriggered:
                         {
                             _closeDialog.preventClosing = false
@@ -292,9 +293,10 @@ StackView
 
         template.iconSource: "dialog-warning"
 
-        standardButtons: Dialog.Yes | Dialog.No
+        standardButtons: Dialog.Discard | Dialog.Cancel
+        Component.onCompleted: standardButton(Dialog.Discard).text = i18n("Delete")
 
-        onAccepted:
+        onDiscarded:
         {
             var indices = []
             for (var uri of notes)
