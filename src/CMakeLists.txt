@@ -87,3 +87,10 @@ install(FILES org.maui.buho.metainfo.xml DESTINATION ${KDE_INSTALL_METAINFODIR})
 
 qt_finalize_target(${PROJECT_NAME})
 
+target_precompile_headers(${PROJECT_NAME} PRIVATE
+    <QDebug>
+    <QFileInfo>
+    <QGuiApplication>
+    <QQmlEngine>
+    <QQuickWindow>
+)
